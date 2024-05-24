@@ -1,21 +1,42 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from "react-native";
+import React from "react";
+import ControlButton from "../../components/buttons/ControlButton";
+import BlueInput from "../../components/inputs/BlueInput";
 
 const Scanner = () => {
-  return (
-    <View style={style.container}>
-      <Text>Scanner</Text>
-    </View>
-  )
-}
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>Scanner</Text>
 
-export default Scanner
+            <ControlButton
+                source={require("../../../assets/images/Add.png")}
+                size={36}
+                style={styles.add}
+            />
+        </View>
+    );
+};
 
-const style = {
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#030B38',
-  },
-}
+export default Scanner;
+
+const styles = {
+    container: {
+        flex: 1,
+        backgroundColor: "#030B38",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    title: {
+        position: "absolute",
+        left: 23,
+        top: 49,
+        fontFamily: "BROmnySemiBold",
+        fontSize: 25,
+        color: "#fff",
+    },
+    add: {
+        position: "absolute",
+        left: 355,
+        top: 49,
+    },
+};

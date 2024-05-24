@@ -3,11 +3,14 @@ import { TextInput, View, StyleSheet, Image } from "react-native";
 
 const BlueInput = ({
     placeholder,
+    onChangeText,
+    value,
     style,
     image,
     width = 350,
     height = 55,
     fontSize = 15,
+    backgroundColor = "#1E264D",
 }) => {
     return (
         <View style={[styles.container, { width, height }, style]}>
@@ -15,10 +18,12 @@ const BlueInput = ({
                 style={[
                     styles.input,
                     image && styles.inputWithImage,
-                    { fontSize },
+                    { fontSize, backgroundColor },
                 ]}
                 placeholder={placeholder}
                 placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                onChangeText={onChangeText}
+                value={value}
             />
             {image && <Image source={image} style={styles.image} />}
         </View>
@@ -33,7 +38,6 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        backgroundColor: "#1E264D",
         borderWidth: 1,
         borderColor: "rgba(255, 255, 255, 0.17)",
         borderRadius: 100,
