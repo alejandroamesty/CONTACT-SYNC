@@ -1,16 +1,15 @@
 import React from "react";
 import { TextInput, View, StyleSheet, Image } from "react-native";
 
-const BlueInput = ({
+const GrayInput = ({
     placeholder,
     onChangeText,
     value,
     style,
     image,
-    width = 350,
-    height = 55,
+    width = 360,
+    height = 40,
     fontSize = 15,
-    backgroundColor = "#1E264D",
 }) => {
     return (
         <View style={[styles.container, { width, height }, style]}>
@@ -18,10 +17,10 @@ const BlueInput = ({
                 style={[
                     styles.input,
                     image && styles.inputWithImage,
-                    { fontSize, backgroundColor },
+                    { fontSize },
                 ]}
                 placeholder={placeholder}
-                placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                placeholderTextColor="#7D7D7D"
                 onChangeText={onChangeText}
                 value={value}
             />
@@ -33,30 +32,29 @@ const BlueInput = ({
 const styles = StyleSheet.create({
     container: {
         position: "relative",
-        width: 350,
-        height: 55,
+        width: 360,
+        height: 40,
     },
     input: {
         flex: 1,
-        borderWidth: 1,
-        borderColor: "rgba(255, 255, 255, 0.17)",
+        backgroundColor: "#EDEEF0",
         borderRadius: 100,
         paddingHorizontal: 20,
-        color: "white",
+        color: "black",
         height: "100%",
-        paddingRight: 55,
+        paddingRight: 16,
     },
     inputWithImage: {
-        paddingRight: 55,
+        paddingRight: 16,
     },
     image: {
         position: "absolute",
-        width: 23,
-        height: 23,
+        width: 20,
+        height: 20,
         right: 20,
-        top: (55 - 23) / 2,
+        top: (40 - 20) / 2,
         zIndex: 1,
     },
 });
 
-export default BlueInput;
+export default GrayInput;

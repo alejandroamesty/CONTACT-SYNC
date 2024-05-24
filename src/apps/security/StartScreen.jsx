@@ -36,10 +36,6 @@ const styles = StyleSheet.create({
     },
     normalText: {
         position: "absolute",
-        width: 194,
-        height: 50,
-        left: 130,
-        top: 343,
         fontFamily: "BROmnyRegular",
         fontSize: 32,
         color: "#fff",
