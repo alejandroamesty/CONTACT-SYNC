@@ -16,7 +16,7 @@ import Groups from "./Groups";
 import Scanner from "./Scanner";
 import Profile from "./Profile";
 
-const MainTab = () => {
+const MainTab = ({ navigation }) => {
     const [selectedTab, setSelectedTab] = useState("Home");
 
     const renderContent = () => {
@@ -28,7 +28,7 @@ const MainTab = () => {
             case "Scanner":
                 return <Scanner />;
             case "Profile":
-                return <Profile />;
+                return <Profile navigation={navigation} />;
             default:
                 return <Home />;
         }
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
         backgroundColor: "#1E264D",
         borderColor: "#444B6B",
-        borderWidth: 2,
+        borderWidth: 1,
         borderRadius: 100,
         alignItems: "center",
         height: 63,
