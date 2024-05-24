@@ -1,15 +1,15 @@
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
-import BlueInput from "../components/BlueInput";
-import SaveButton from "../components/SaveButton";
-import ControlButton from "../components/ControlButton";
+import BlueInput from "../../components/inputs/BlueInput";
+import SaveButton from "../../components/buttons/SaveButton";
+import ControlButton from "../../components/buttons/ControlButton";
 
 const SignIn = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ControlButton
                 onPress={() => navigation.navigate("StartScreen")}
-                source={require("../../assets/images/arrow-go-back.png")}
+                source={require("../../../assets/images/arrow-go-back.png")}
                 size={40}
                 style={styles.arrow}
             />
@@ -35,7 +35,11 @@ const SignIn = ({ navigation }) => {
                 <Text style={styles.forgotPasswordText}>Forgot password?</Text>
             </TouchableOpacity>
 
-            <SaveButton title="Sign in" style={styles.saveButton} />
+            <SaveButton
+                onPress={() => navigation.navigate("MainTab")}
+                title="Sign in"
+                style={styles.saveButton}
+            />
 
             <TouchableOpacity
                 onPress={() => navigation.navigate("SignUp")}
