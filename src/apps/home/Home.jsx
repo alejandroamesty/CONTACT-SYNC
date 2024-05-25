@@ -4,6 +4,7 @@ import BlueInput from "../../components/inputs/BlueInput";
 import GrayInput from "../../components/inputs/GrayInput";
 import ControlButton from "../../components/buttons/ControlButton";
 import ContactList from "../../components/lists/ContactList";
+import Carousel from "../../components/Carousel";
 
 const contacts = [
     {
@@ -53,6 +54,7 @@ const contacts = [
 const Home = () => {
     const [searchText, setSearchText] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
+    const [firstName, setFirstName] = useState("");
 
     const filteredContacts = useMemo(
         () =>
@@ -76,6 +78,11 @@ const Home = () => {
         <View style={styles.container}>
             <Text style={styles.title}>Hello</Text>
             <Text style={styles.subtitle}>Alejandro Ávila</Text>
+            <View style={styles.userIcon}>
+                <Text style={styles.firstNameInitial}>
+                    {firstName ? firstName[0].toUpperCase() : "A"}
+                </Text>
+            </View>
 
             <Text style={styles.undertitle}>Contacts</Text>
 
@@ -121,10 +128,19 @@ const Home = () => {
                             <Text style={styles.doneButton}>Done</Text>
                         </TouchableOpacity>
                         <Text style={styles.modalText}>New contact</Text>
+                        <View style={styles.carouselContainer}>
+                            <Carousel
+                                letter={
+                                    firstName ? firstName[0].toUpperCase() : "?"
+                                }
+                            />
+                        </View>
                         <View style={styles.inputContact}>
                             <GrayInput
                                 placeholder="First name"
                                 style={styles.input}
+                                value={firstName}
+                                onChangeText={setFirstName}
                             />
                             <GrayInput
                                 placeholder="Last name"
@@ -220,6 +236,10 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 40,
         zIndex: 1,
     },
+    carouselContainer: {
+        marginLeft: -20,
+        marginRight: -20,
+    },
     modalText: {
         fontSize: 21,
         left: 10,
@@ -252,5 +272,25 @@ const styles = StyleSheet.create({
     },
     lastInput: {
         marginBottom: 0,
+    },
+    userIcon: {
+        position: "absolute",
+        right: 25,
+        top: 214,
+        width: 48,
+        height: 48,
+        top: 55,
+        borderRadius: 24,
+        backgroundColor: "#0684FE",
+        justifyContent: "center",
+    },
+    firstNameInitial: {
+        position: "absolute",
+        fontFamily: "BROmnyMedium",
+        fontStyle: "normal",
+        fontWeight: "500",
+        fontSize: 24,
+        alignSelf: "center",
+        color: "#FFFFFF",
     },
 });

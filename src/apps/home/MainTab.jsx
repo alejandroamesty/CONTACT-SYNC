@@ -14,7 +14,7 @@ import ProfileSelected from "../../../assets/images/NavBar/selected/Profile-Sele
 import Home from "./Home";
 import Groups from "./Groups";
 import Scanner from "./Scanner";
-import Profile from "./Profile";
+import Profile from "./profile/Profile";
 
 const MainTab = ({ navigation }) => {
     const [selectedTab, setSelectedTab] = useState("Home");
