@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Easing } from "react-native";
+import {
+    View,
+    Text,
+    Image,
+    StyleSheet,
+    TouchableOpacity,
+    Animated,
+    Easing,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 
 const GroupCard = ({ iconName, groupName, contactCount, backgroundColor }) => {
+    const navigation = useNavigation();
+
     const iconSource = {
         Favorites: require("../../../assets/images/GroupCard/Favorites.png"),
         Emergency: require("../../../assets/images/GroupCard/Emergency.png"),
@@ -40,28 +52,32 @@ const GroupCard = ({ iconName, groupName, contactCount, backgroundColor }) => {
         }).start();
     };
 
+    const handlePress = () => {
+        navigation.navigate("GroupDetail", { groupName });
+    };
+
     return (
         <TouchableOpacity
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
+            onPress={handlePress}
             activeOpacity={0.8}
         >
-            <Animated.View
-                style={[
-                    styles.groupCard,
-                    {
-                        backgroundColor: gradientColors[0],
-                        transform: [{ scale: scaleValue }],
-                    },
-                ]}
-            >
-                <Image source={iconSource} style={styles.icon} />
-                <Text style={styles.groupName}>{groupName}</Text>
-                <Text style={styles.contactCount}>• {contactCount} contacts</Text>
-                <Image
-                    source={require("../../../assets/images/GroupCard/Plus.png")}
-                    style={styles.addIcon}
-                />
+            <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+                <LinearGradient
+                    colors={gradientColors}
+                    style={styles.groupCard}
+                >
+                    <Image source={iconSource} style={styles.icon} />
+                    <Text style={styles.groupName}>{groupName}</Text>
+                    <Text style={styles.contactCount}>
+                        • {contactCount} contacts
+                    </Text>
+                    <Image
+                        source={require("../../../assets/images/GroupCard/Plus.png")}
+                        style={styles.addIcon}
+                    />
+                </LinearGradient>
             </Animated.View>
         </TouchableOpacity>
     );
