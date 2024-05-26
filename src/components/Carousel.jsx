@@ -6,6 +6,7 @@ import {
     StyleSheet,
     Dimensions,
     Animated,
+    Image,
 } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -21,7 +22,7 @@ const colors = [
 const ITEM_WIDTH = 121 + 30;
 const SPACER_ITEM_SIZE = (width - ITEM_WIDTH) / 2;
 
-const Carousel = ({ letter = "?" }) => {
+const Carousel = ({ letter = "?", image }) => {
     const scrollX = useRef(new Animated.Value(0)).current;
     const flatListRef = useRef(null);
     const [currentIndex, setCurrentIndex] = useState(1);
@@ -96,7 +97,11 @@ const Carousel = ({ letter = "?" }) => {
                         },
                     ]}
                 >
-                    <Text style={styles.circleText}>{letter}</Text>
+                    {image ? (
+                        <Image source={image} style={styles.image} />
+                    ) : (
+                        <Text style={styles.circleText}>{letter}</Text>
+                    )}
                 </Animated.View>
             </View>
         );
@@ -152,6 +157,11 @@ const styles = StyleSheet.create({
         color: "#FFF",
         fontSize: 60,
         fontFamily: "BROmnySemiBold",
+    },
+    image: {
+        width: 50,
+        height: 46,
+        resizeMode: "contain",
     },
 });
 
