@@ -1,10 +1,16 @@
 import React, { useState, useMemo } from "react";
-import { StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
-import BlueInput from "../../components/inputs/BlueInput";
-import GrayInput from "../../components/inputs/GrayInput";
-import ControlButton from "../../components/buttons/ControlButton";
-import ContactList from "../../components/lists/ContactList";
-import Carousel from "../../components/Carousel";
+import { StyleSheet, View, Text } from "react-native";
+import ControlButton from "../../../components/buttons/ControlButton";
+import ContactList from "../../../components/lists/ContactList";
+import { createStackNavigator } from "@react-navigation/stack";
+import ContactDetail from "./ContactDetail";
+
+import BlueInput from "../../../components/inputs/BlueInput";
+import GrayInput from "../../../components/inputs/GrayInput";
+import Carousel from "../../../components/Carousel";
+import CustomModal from "../../../components/modals/CustomModal";
+
+const Stack = createStackNavigator();
 
 const contacts = [
     {
@@ -51,7 +57,7 @@ const contacts = [
     },
 ];
 
-const Home = () => {
+const HomeScreen = ({ navigation }) => {
     const [searchText, setSearchText] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [firstName, setFirstName] = useState("");
@@ -78,16 +84,11 @@ const Home = () => {
         <View style={styles.container}>
             <Text style={styles.title}>Hello</Text>
             <Text style={styles.subtitle}>Alejandro Ávila</Text>
-            <View style={styles.userIcon}>
-                <Text style={styles.firstNameInitial}>
-                    {firstName ? firstName[0].toUpperCase() : "A"}
-                </Text>
-            </View>
 
             <Text style={styles.undertitle}>Contacts</Text>
 
             <ControlButton
-                source={require("../../../assets/images/Add.png")}
+                source={require("../../../../assets/images/Add.png")}
                 size={36}
                 style={styles.add}
                 onPress={openModal}
@@ -99,7 +100,7 @@ const Home = () => {
                 width={366}
                 height={60}
                 fontSize={18}
-                image={require("../../../assets/images/Search.png")}
+                image={require("../../../../assets/images/Search.png")}
                 value={searchText}
                 onChangeText={setSearchText}
                 backgroundColor="#030B38"
@@ -110,24 +111,22 @@ const Home = () => {
                     contacts={filteredContacts}
                     addToGroup={() => {}}
                     deleteContact={() => {}}
+                    navigation={navigation}
                 />
             </View>
 
-            <Modal
-                animationType="slide"
-                transparent={true}
+            <CustomModal
                 visible={modalVisible}
-                onRequestClose={closeModal}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <TouchableOpacity onPress={closeModal}>
-                            <Text style={styles.cancelButton}>Cancel</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={closeModal}>
-                            <Text style={styles.doneButton}>Done</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.modalText}>New contact</Text>
+                closeModal={closeModal}
+                title="New contact"
+                cancelButtonName="Cancel"
+                doneButtonName="Done"
+                cancelButtonAction={closeModal}
+                doneButtonAction={closeModal}
+                cancelButtonColor="#F50"
+                doneButtonColor="#33BE99"
+                modalContent={
+                    <View>
                         <View style={styles.carouselContainer}>
                             <Carousel
                                 letter={
@@ -160,9 +159,26 @@ const Home = () => {
                             />
                         </View>
                     </View>
-                </View>
-            </Modal>
+                }
+            />
         </View>
+    );
+};
+
+const Home = () => {
+    return (
+        <Stack.Navigator initialRouteName="HomeScreen">
+            <Stack.Screen
+                name="HomeScreen"
+                component={HomeScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="ContactDetail"
+                component={ContactDetail}
+                options={{ headerShown: false }}
+            />
+        </Stack.Navigator>
     );
 };
 
@@ -222,46 +238,9 @@ const styles = StyleSheet.create({
         bottom: 2,
         overflow: "hidden",
     },
-    modalContainer: {
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        justifyContent: "flex-end",
-    },
-    modalContent: {
-        backgroundColor: "#fff",
-        padding: 20,
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
-        zIndex: 1,
-    },
     carouselContainer: {
         marginLeft: -20,
         marginRight: -20,
-    },
-    modalText: {
-        fontSize: 21,
-        left: 10,
-        fontFamily: "BROmnySemiBold",
-        marginBottom: 20,
-        marginTop: 60,
-    },
-    cancelButton: {
-        position: "absolute",
-        left: 10,
-        top: 10,
-        fontSize: 18,
-        fontFamily: "BROmnyMedium",
-        color: "#F50",
-    },
-    doneButton: {
-        position: "absolute",
-        right: 10,
-        top: 10,
-        fontSize: 18,
-        fontFamily: "BROmnyMedium",
-        color: "#33BE99",
     },
     inputContact: {
         marginTop: 20,
