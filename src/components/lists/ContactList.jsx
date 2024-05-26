@@ -23,7 +23,7 @@ const renderRightActions = (
                 onPress={() => addToGroup(contactId)}
             >
                 <Image
-                    source={require("../../../assets/images/Add.png")}
+                    source={require("../../../assets/images/AddGroup.png")}
                     style={styles.actionIcon}
                 />
             </TouchableOpacity>
@@ -32,7 +32,7 @@ const renderRightActions = (
                 onPress={() => deleteContact(contactId)}
             >
                 <Image
-                    source={require("../../../assets/images/arrow-go-back.png")}
+                    source={require("../../../assets/images/Profile/Delete.png")}
                     style={styles.actionIcon}
                 />
             </TouchableOpacity>
@@ -40,7 +40,7 @@ const renderRightActions = (
     );
 };
 
-const ContactItem = ({ contact, addToGroup, deleteContact }) => {
+const ContactItem = ({ contact, addToGroup, deleteContact, onPress }) => {
     return (
         <Swipeable
             renderRightActions={(progress, dragX) =>
@@ -53,29 +53,35 @@ const ContactItem = ({ contact, addToGroup, deleteContact }) => {
                 )
             }
         >
-            <View style={styles.contactItem}>
-                <View
-                    style={[
-                        styles.contactIcon,
-                        { backgroundColor: contact.color },
-                    ]}
-                >
-                    <Text style={styles.contactIconText}>
-                        {contact.firstName[0].toUpperCase()}
-                    </Text>
+            <TouchableOpacity onPress={() => onPress(contact)}>
+                <View style={styles.contactItem}>
+                    <View
+                        style={[
+                            styles.contactIcon,
+                            { backgroundColor: contact.color },
+                        ]}
+                    >
+                        <Text style={styles.contactIconText}>
+                            {contact.firstName[0].toUpperCase()}
+                        </Text>
+                    </View>
+                    <View style={styles.contactInfo}>
+                        <Text style={styles.contactName}>
+                            {contact.firstName} {contact.lastName}
+                        </Text>
+                        <Text style={styles.contactPhone}>{contact.phone}</Text>
+                    </View>
                 </View>
-                <View style={styles.contactInfo}>
-                    <Text style={styles.contactName}>
-                        {contact.firstName} {contact.lastName}
-                    </Text>
-                    <Text style={styles.contactPhone}>{contact.phone}</Text>
-                </View>
-            </View>
+            </TouchableOpacity>
         </Swipeable>
     );
 };
 
-const ContactList = ({ contacts, addToGroup, deleteContact }) => {
+const ContactList = ({ contacts, addToGroup, deleteContact, navigation }) => {
+    const handlePress = (contact) => {
+        navigation.navigate("ContactDetail", { contact });
+    };
+
     const sortedContacts = contacts.sort((a, b) => {
         const nameA =
             a.firstName.toUpperCase() + " " + a.lastName.toUpperCase();
@@ -116,6 +122,7 @@ const ContactList = ({ contacts, addToGroup, deleteContact }) => {
                                 contact={contact}
                                 addToGroup={addToGroup}
                                 deleteContact={deleteContact}
+                                onPress={handlePress}
                             />
                             {renderSeparator()}
                         </React.Fragment>
@@ -178,8 +185,7 @@ const styles = StyleSheet.create({
     },
     addGroup: {
         backgroundColor: "#0684FE",
-        borderTopRightRadius: 20,
-        borderBottomRightRadius: 20,
+        borderRadius: 20,
         justifyContent: "center",
         alignItems: "center",
         width: 60,
@@ -187,8 +193,7 @@ const styles = StyleSheet.create({
     },
     delete: {
         backgroundColor: "#F4385A",
-        borderTopRightRadius: 20,
-        borderBottomRightRadius: 20,
+        borderRadius: 20,
         justifyContent: "center",
         alignItems: "center",
         width: 60,
