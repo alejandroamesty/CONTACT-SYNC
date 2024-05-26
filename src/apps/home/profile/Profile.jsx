@@ -12,7 +12,7 @@ const Profile = ({ navigation }) => {
     };
 
     return (
-        <Stack.Navigator headerMode="none">
+        <Stack.Navigator>
             <Stack.Screen name="ProfileScreen" options={{ headerShown: false }}>
                 {() => (
                     <View style={styles.container}>
@@ -90,7 +90,7 @@ const Profile = ({ navigation }) => {
                     </View>
                 )}
             </Stack.Screen>
-            <Stack.Screen name="EditAccount" component={EditAccount} />
+            <Stack.Screen name="EditAccount" component={EditAccount} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 };

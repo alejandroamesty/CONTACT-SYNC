@@ -11,9 +11,9 @@ import GroupsSelected from "../../../assets/images/NavBar/selected/Groups-Select
 import ScannerSelected from "../../../assets/images/NavBar/selected/Scanner-Selected.png";
 import ProfileSelected from "../../../assets/images/NavBar/selected/Profile-Selected.png";
 
-import Home from "./Home";
-import Groups from "./Groups";
-import Scanner from "./Scanner";
+import Home from "./contacts/Home";
+import Groups from "./groups/Groups";
+import Scanner from "./scanner/Scanner";
 import Profile from "./profile/Profile";
 
 const MainTab = ({ navigation }) => {

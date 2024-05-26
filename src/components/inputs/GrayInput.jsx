@@ -10,19 +10,27 @@ const GrayInput = ({
     width = 360,
     height = 40,
     fontSize = 15,
+    borderRadius = 18,
 }) => {
+    const multiline = height > 40;
+
     return (
-        <View style={[styles.container, { width, height }, style]}>
+        <View
+            style={[styles.container, { width, height, borderRadius }, style]}
+        >
             <TextInput
                 style={[
                     styles.input,
                     image && styles.inputWithImage,
                     { fontSize },
+                    multiline && styles.multilineInput,
                 ]}
                 placeholder={placeholder}
                 placeholderTextColor="#7D7D7D"
                 onChangeText={onChangeText}
                 value={value}
+                multiline={multiline}
+                numberOfLines={multiline ? undefined : 1}
             />
             {image && <Image source={image} style={styles.image} />}
         </View>
@@ -34,11 +42,11 @@ const styles = StyleSheet.create({
         position: "relative",
         width: 360,
         height: 40,
+        overflow: "hidden",
     },
     input: {
         flex: 1,
         backgroundColor: "#EDEEF0",
-        borderRadius: 100,
         paddingHorizontal: 20,
         color: "black",
         height: "100%",
@@ -46,6 +54,9 @@ const styles = StyleSheet.create({
     },
     inputWithImage: {
         paddingRight: 16,
+    },
+    multilineInput: {
+        paddingTop: 16,
     },
     image: {
         position: "absolute",

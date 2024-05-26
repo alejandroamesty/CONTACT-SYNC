@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
-import ControlButton from "../../components/buttons/ControlButton";
-import BlueInput from "../../components/inputs/BlueInput";
+import ControlButton from "../../../components/buttons/ControlButton";
+import BlueInput from "../../../components/inputs/BlueInput";
 
 const Scanner = () => {
     return (
@@ -9,7 +9,7 @@ const Scanner = () => {
             <Text style={styles.title}>Scanner</Text>
 
             <ControlButton
-                source={require("../../../assets/images/Add.png")}
+                source={require("../../../../assets/images/Scanner.png")}
                 size={36}
                 style={styles.add}
             />
