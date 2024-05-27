@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
         color: "#7D7D7D",
     },
     buttonRight: {
-        fontFamily: "BROmnSemiBold",
+        fontFamily: "BROmnySemiBold",
         fontSize: 16,
         color: "#F74040",
     },
