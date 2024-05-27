@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { StyleSheet, View, Text, ScrollView, SafeAreaView } from "react-native";
+import { StyleSheet, View, Text, ScrollView, Animated } from "react-native";
 
 import ControlButton from "../../../components/buttons/ControlButton";
 import BlueInput from "../../../components/inputs/BlueInput";
@@ -99,22 +99,48 @@ const Groups = () => {
 
 const GroupsScreen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
-    const [secondModalVisible, setSecondModalVisible] = useState(false);
+    const [currentStep, setCurrentStep] = useState(1);
+    const fadeAnim = useRef(new Animated.Value(1)).current;
 
     const openModal = () => {
         setModalVisible(true);
+        setCurrentStep(1);
+        fadeAnim.setValue(1);
     };
 
     const closeModal = () => {
         setModalVisible(false);
+        setCurrentStep(1);
     };
 
-    const openSecondModal = () => {
-        setSecondModalVisible(true);
+    const goToNextStep = () => {
+        Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => {
+            setCurrentStep(2);
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        });
     };
 
-    const closeSecondModal = () => {
-        setSecondModalVisible(false);
+    const goToPreviousStep = () => {
+        Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => {
+            setCurrentStep(1);
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        });
     };
 
     return (
@@ -157,56 +183,47 @@ const GroupsScreen = ({ navigation }) => {
             <CustomModal
                 visible={modalVisible}
                 closeModal={closeModal}
-                title="Add members"
-                cancelButtonName="Cancel"
-                doneButtonName="Next"
-                cancelButtonAction={closeModal}
-                doneButtonAction={openSecondModal}
-                cancelButtonColor="#7D7D7D"
+                title={currentStep === 1 ? "Add members" : "New group"}
+                cancelButtonName={currentStep === 1 ? "Cancel" : "Back"}
+                doneButtonName={currentStep === 1 ? "Next" : "Create"}
+                cancelButtonAction={currentStep === 1 ? closeModal : goToPreviousStep}
+                doneButtonAction={currentStep === 1 ? goToNextStep : closeModal}
+                cancelButtonColor={currentStep === 1 ? "#F50000" : "#7D7D7D"}
                 doneButtonColor="#33BE99"
                 modalContent={
-                    <View style={styles.modalContainer}>
-                        <GrayInput
-                            placeholder="Search name or number"
-                            image={require("../../../../assets/images/Search.png")}
-                        />
-                        <View style={styles.list}>
-                            <List data={data} />
-                        </View>
-                    </View>
-                }
-            />
-
-            <CustomModal
-                visible={secondModalVisible}
-                closeModal={closeSecondModal}
-                title="New group"
-                cancelButtonName="Back"
-                doneButtonName="Create"
-                cancelButtonAction={closeSecondModal}
-                doneButtonAction={closeSecondModal}
-                cancelButtonColor="#7D7D7D"
-                doneButtonColor="#33BE99"
-                modalContent={
-                    <View>
-                        <View style={styles.carouselContainer}>
-                            <Carousel
-                                image={require("../../../../assets/images/GroupCard/Group.png")}
-                            />
-                        </View>
-                        <View style={styles.inputContact}>
-                            <GrayInput
-                                placeholder="Group name"
-                                style={styles.input}
-                            />
-                            <GrayInput
-                                placeholder="Description"
-                                style={styles.lastInput}
-                                height={78}
-                                borderRadius={18}
-                            />
-                        </View>
-                    </View>
+                    <Animated.View style={{ opacity: fadeAnim }}>
+                        {currentStep === 1 ? (
+                            <View style={styles.modalContainer}>
+                                <GrayInput
+                                    placeholder="Search name or number"
+                                    image={require("../../../../assets/images/Search.png")}
+                                />
+                                <View style={styles.list}>
+                                    <List data={data} />
+                                </View>
+                            </View>
+                        ) : (
+                            <View>
+                                <View style={styles.carouselContainer}>
+                                    <Carousel
+                                        image={require("../../../../assets/images/GroupCard/Group.png")}
+                                    />
+                                </View>
+                                <View style={styles.inputContact}>
+                                    <GrayInput
+                                        placeholder="Group name"
+                                        style={styles.input}
+                                    />
+                                    <GrayInput
+                                        placeholder="Description"
+                                        style={styles.lastInput}
+                                        height={78}
+                                        borderRadius={18}
+                                    />
+                                </View>
+                            </View>
+                        )}
+                    </Animated.View>
                 }
             />
         </View>
@@ -263,7 +280,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     lastInput: {
-        marginBottom: 232,
+        marginBottom: 244,
     },
     userIcon: {
         position: "absolute",
