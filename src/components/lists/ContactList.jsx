@@ -9,15 +9,9 @@ import {
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 
-const renderRightActions = (
-    progress,
-    dragX,
-    contactId,
-    addToGroup,
-    deleteContact
-) => {
+const renderLeftActions = (contactId, addToGroup) => {
     return (
-        <View style={styles.rightActions}>
+        <View style={styles.leftActions}>
             <TouchableOpacity
                 style={styles.addGroup}
                 onPress={() => addToGroup(contactId)}
@@ -27,6 +21,13 @@ const renderRightActions = (
                     style={styles.actionIcon}
                 />
             </TouchableOpacity>
+        </View>
+    );
+};
+
+const renderRightActions = (contactId, deleteContact) => {
+    return (
+        <View style={styles.rightActions}>
             <TouchableOpacity
                 style={styles.delete}
                 onPress={() => deleteContact(contactId)}
@@ -43,14 +44,11 @@ const renderRightActions = (
 const ContactItem = ({ contact, addToGroup, deleteContact, onPress }) => {
     return (
         <Swipeable
+            renderLeftActions={(progress, dragX) =>
+                renderLeftActions(progress, dragX, contact.id, addToGroup)
+            }
             renderRightActions={(progress, dragX) =>
-                renderRightActions(
-                    progress,
-                    dragX,
-                    contact.id,
-                    addToGroup,
-                    deleteContact
-                )
+                renderRightActions(progress, dragX, contact.id, deleteContact)
             }
         >
             <TouchableOpacity onPress={() => onPress(contact)}>
@@ -178,8 +176,12 @@ const styles = StyleSheet.create({
         color: "#FFFFFF",
     },
     rightActions: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+    },
+    leftActions: {
+        justifyContent: "center",
         alignItems: "center",
         height: "100%",
     },
