@@ -1,14 +1,45 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import ControlButton from "../../../components/buttons/ControlButton";
 import { createStackNavigator } from "@react-navigation/stack";
 import EditAccount from "./EditAccount";
+import ConfirmationModal from "../../../components/modals/ConfirmationModal";
+import SpecialModal from "../../../components/modals/SpecialModal";
+import GrayInput from "../../../components/inputs/GrayInput";
 
 const Stack = createStackNavigator();
 
 const Profile = ({ navigation }) => {
+    const [modalVisible, setModalVisible] = useState(false);
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
     const goToEditAccount = () => {
         navigation.navigate("EditAccount");
+    };
+
+    const handleLogOut = () => {
+        setModalVisible(true);
+    };
+
+    const onCancel = () => {
+        setModalVisible(false);
+    };
+
+    const onNevermind = () => {
+        setDeleteModalVisible(false);
+    };
+
+    const onAccept = () => {
+        setModalVisible(false);
+        navigation.navigate("StartScreen");
+    };
+
+    const handleDeleteAccount = () => {
+        setDeleteModalVisible(true);
+    };
+
+    const onDelete = () => {
+        setDeleteModalVisible(false);
     };
 
     return (
@@ -19,7 +50,7 @@ const Profile = ({ navigation }) => {
                         <Text style={styles.title}>Profile</Text>
 
                         <View style={styles.buttons}>
-                            <TouchableOpacity onPress={goToEditAccount}>
+                            <TouchableOpacity>
                                 <View style={styles.card}>
                                     <ControlButton
                                         source={require("../../../../assets/images/Profile/Edit.png")}
@@ -57,9 +88,7 @@ const Profile = ({ navigation }) => {
                                 </View>
                             </TouchableOpacity>
 
-                            <TouchableOpacity
-                            // onPress={() => navigation.navigate("StartScreen")}
-                            >
+                            <TouchableOpacity onPress={handleDeleteAccount}>
                                 <View style={styles.button}>
                                     <ControlButton
                                         source={require("../../../../assets/images/Profile/Delete.png")}
@@ -72,11 +101,31 @@ const Profile = ({ navigation }) => {
                                 </View>
                             </TouchableOpacity>
 
-                            <TouchableOpacity
-                                onPress={() =>
-                                    navigation.navigate("StartScreen")
+                            <SpecialModal
+                                visible={deleteModalVisible}
+                                closeModal={onCancel}
+                                title="Now just a minute."
+                                cancelButtonName="NEVERMIND"
+                                doneButtonName="DELETE EVERYTHING"
+                                cancelButtonAction={onNevermind}
+                                doneButtonAction={onDelete}
+                                cancelButtonColor="#7D7D7D"
+                                doneButtonColor="#F74040"
+                                modalContent={
+                                    <View style={styles.inputDelete}>
+                                        <GrayInput
+                                            placeholder="Email"
+                                            style={styles.input}
+                                        />
+                                        <GrayInput
+                                            placeholder="Password"
+                                            style={styles.lastInput}
+                                        />
+                                    </View>
                                 }
-                            >
+                            />
+
+                            <TouchableOpacity onPress={handleLogOut}>
                                 <View style={styles.button}>
                                     <ControlButton
                                         source={require("../../../../assets/images/Profile/Leave.png")}
@@ -87,10 +136,25 @@ const Profile = ({ navigation }) => {
                                 </View>
                             </TouchableOpacity>
                         </View>
+
+                        <ConfirmationModal
+                            visible={modalVisible}
+                            image={require("../../../../assets/images/Logout.png")}
+                            title="See you soon!"
+                            text="You are about to logout. Are you sure this is what you want?"
+                            cancelButtonText="CANCEL"
+                            acceptButtonText="ACCEPT"
+                            onCancel={onCancel}
+                            onAccept={onAccept}
+                        />
                     </View>
                 )}
             </Stack.Screen>
-            <Stack.Screen name="EditAccount" component={EditAccount} options={{ headerShown: false }} />
+            <Stack.Screen
+                name="EditAccount"
+                component={EditAccount}
+                options={{ headerShown: false }}
+            />
         </Stack.Navigator>
     );
 };
@@ -182,5 +246,14 @@ const styles = StyleSheet.create({
         fontSize: 24,
         alignSelf: "center",
         color: "#FFFFFF",
+    },
+    input: {
+        marginBottom: 12,
+    },
+    lastInput: {
+        marginBottom: 12,
+    },
+    inputDelete: {
+        alignSelf: "center",
     },
 });
