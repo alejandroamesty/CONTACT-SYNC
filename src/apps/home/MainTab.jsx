@@ -110,8 +110,7 @@ const styles = StyleSheet.create({
     },
     label: {
         marginLeft: 8,
-        fontFamily: "BR Omny",
-        fontWeight: "600",
+        fontFamily: "BROmnySemiBold",
         fontSize: 14,
         lineHeight: 18,
         color: "#030B38",

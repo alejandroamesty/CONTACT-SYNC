@@ -101,14 +101,13 @@ const styles = StyleSheet.create({
         alignSelf: "center",
     },
     modalTextTitle: {
-        fontFamily: "BR Omny",
-        fontWeight: "600",
+        fontFamily: "BROmnySemiBold",
         fontSize: 25,
         marginBottom: 10,
         textAlign: "center",
     },
     modalText: {
-        fontFamily: "BR Omny",
+        fontFamily: "BROmnyRegular",
         width: 285,
         fontSize: 18,
         marginBottom: 10,
@@ -124,14 +123,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     buttonLeft: {
-        fontFamily: "BR Omny",
-        fontWeight: "600",
+        fontFamily: "BROmnySemiBold",
         fontSize: 16,
         color: "#7D7D7D",
     },
     buttonRight: {
-        fontFamily: "BR Omny",
-        fontWeight: "600",
+        fontFamily: "BROmnSemiBold",
         fontSize: 16,
         color: "#F74040",
     },
