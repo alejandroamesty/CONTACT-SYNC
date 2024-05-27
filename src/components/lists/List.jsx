@@ -72,9 +72,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 29,
     },
     letter: {
-        fontFamily: "BR Omny",
+        fontFamily: "BROmnySemiBold",
         fontStyle: "normal",
-        fontWeight: "600",
         fontSize: 16,
         lineHeight: 18,
         color: "#7D7D7D",
