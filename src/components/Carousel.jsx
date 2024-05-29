@@ -51,9 +51,11 @@ const Carousel = ({ letter = "?", image }) => {
 
     const onMomentumScrollEnd = (event) => {
         const contentOffsetX = event.nativeEvent.contentOffset.x;
-        const index = Math.floor(contentOffsetX / ITEM_WIDTH);
-        console.log("Selected item:", colors[index]);
-        setCurrentIndex(index);
+        const index = Math.round(contentOffsetX / ITEM_WIDTH);
+        if (index >= 0 && index < colors.length) {
+            console.log("Selected item:", colors[index]);
+            setCurrentIndex(index);
+        }
     };
 
     const renderItem = ({ item, index }) => {
