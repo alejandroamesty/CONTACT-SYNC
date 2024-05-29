@@ -10,7 +10,9 @@ const GrayInput = ({ placeholder, onChangeText, value, style, image, width = 360
 				style={[styles.input, image && styles.inputWithImage, { fontSize }, multiline && styles.multilineInput]}
 				placeholder={placeholder}
 				placeholderTextColor="#7D7D7D"
-				onChangeText={(text) => onChangeText(text)}
+				onChangeText={(text) => {
+					if (onChangeText) onChangeText(text);
+				}}
 				value={value}
 				multiline={multiline}
 				numberOfLines={multiline ? undefined : 1}
