@@ -20,7 +20,6 @@ const SpecialModal = ({
     doneButtonColor,
     modalContent,
 }) => {
-    console.log("modalContent:", modalContent);
 
     return (
         <Modal
