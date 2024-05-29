@@ -27,7 +27,6 @@ const HomeScreen = ({ navigation }) => {
 			},
 		})
 			.then((response) => {
-				console.log("trying to get contacts");
 				if (response.status === 200) {
 					response
 						.text()
@@ -35,13 +34,11 @@ const HomeScreen = ({ navigation }) => {
 							fetchedContacts = JSON.parse(fetchedContacts);
 							const newContacts = [];
 							fetchedContacts.contacts.forEach((contact) => {
-								console.log(contact);
 								if (contact.id !== 1) {
 									newContacts.push(contact);
 								}
 							});
 							setContacts(newContacts);
-							console.log(contacts);
 						})
 						.catch((error) => {
 							console.log("Error:", error);
