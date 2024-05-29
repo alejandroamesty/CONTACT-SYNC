@@ -47,7 +47,6 @@ const GroupsScreen = ({ navigation }) => {
 	const [currentStep, setCurrentStep] = useState(1);
 	const fadeAnim = useRef(new Animated.Value(1)).current;
 	const [groups, setGroups] = useState([]);
-	const [updateGroups, setUpdateGroups] = useState(false);
 
 	useEffect(() => {
 		fetch(`${API_URL}:${API_PORT}/getGroups`, {

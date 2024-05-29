@@ -61,7 +61,7 @@ const SignUp = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<ControlButton
-				onPress={() => navigation.navigate("")}
+				onPress={() => navigation.navigate("StartScreen")}
 				source={require("../../../assets/images/arrow-go-back.png")}
 				size={40}
 				style={styles.arrow}
