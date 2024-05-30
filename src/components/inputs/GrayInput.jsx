@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#EDEEF0",
 		paddingHorizontal: 20,
+		fontFamily: "BROmnyRegular",
 		color: "black",
 		height: "100%",
 		paddingRight: 16,
