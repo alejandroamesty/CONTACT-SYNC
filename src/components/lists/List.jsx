@@ -17,13 +17,13 @@ const ListItem = ({ item, handleCheck }) => {
 	);
 };
 
-const List = ({ data, setExtermalList }) => {
+const List = ({ data, setExternalList }) => {
 	const [items, setItems] = useState(data);
 
 	const handleCheck = (id) => {
 		const newItems = items.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item));
 		setItems(newItems);
-		if (setExtermalList) setExtermalList(newItems);
+		if (setExternalList) setExternalList(newItems);
 	};
 
 	const alphabet = [...new Set(items.map((item) => item.name[0]))].sort();
