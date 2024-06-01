@@ -13,17 +13,15 @@ const BlueInput = ({
 	backgroundColor = "#1E264D",
 	type,
 }) => {
-	function handleOnChangeText(text) {
-		onChangeText(text);
-	}
-
 	return (
 		<View style={[styles.container, { width, height }, style]}>
 			<TextInput
 				style={[styles.input, image && styles.inputWithImage, { fontSize, backgroundColor }]}
 				placeholder={placeholder}
 				placeholderTextColor="rgba(255, 255, 255, 0.5)"
-				onChangeText={handleOnChangeText}
+				onChangeText={(text) => {
+					if (onChangeText) onChangeText(text);
+				}}
 				value={value}
 				secureTextEntry={type === "password"}
 			/>

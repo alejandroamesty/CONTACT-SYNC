@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import { API_URL, API_PORT } from "@env";
 import BlueInput from "../../components/inputs/BlueInput";
@@ -10,11 +10,25 @@ const SignIn = ({ navigation }) => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
-	// create function to handle the sign in with a fetch request
-
-	function testHandleSignIn() {
-		console.log(email, password);
-	}
+	const StartScreen = ({ navigation }) => {
+		useEffect(() => {
+			fetch(`${API_URL}:${API_PORT}/checkSession`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			})
+				.then((response) => {
+					console.log(response.status);
+					if (response.status === 200) {
+						navigation.navigate("MainTab");
+					}
+				})
+				.catch((error) => {
+					console.log("Error:", error);
+				});
+		}, []);
+	};
 
 	async function handleSignIn() {
 		if (email === "" || password === "") {

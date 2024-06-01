@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Easing } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Easing, Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 
@@ -13,12 +13,12 @@ const GroupCard = ({ iconName, groupName, contactCount, backgroundColor }) => {
 	}[iconName];
 
 	const backgroundColors = {
-		1: ["#FF6189", "#FF4574"],
+		1: ["#FFD25A", "#FFAC20"],
 		2: ["#FF906D", "#FF7246"],
-		3: ["#FFD25A", "#FFAC20"],
-		4: ["#3EA0FF", "#0684FE"],
-		5: ["#55DDC2", "#33BE99"],
-		6: ["#FF77F1", "#FF38EB"],
+		3: ["#FF6189", "#FF4574"],
+		4: ["#FF77F1", "#FF38EB"],
+		5: ["#3EA0FF", "#0684FE"],
+		6: ["#55DDC2", "#33BE99"],
 	};
 
 	const gradientColors = backgroundColors[backgroundColor] || backgroundColors[1];
@@ -63,9 +63,11 @@ const GroupCard = ({ iconName, groupName, contactCount, backgroundColor }) => {
 
 export default GroupCard;
 
+var { width } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
 	groupCard: {
-		width: 172,
+		width: 0.4 * width,
 		height: 139,
 		borderRadius: 20,
 		marginBottom: 20,

@@ -16,19 +16,6 @@ import GroupDetail from "./GroupDetail";
 
 const Stack = createStackNavigator();
 
-const data = [
-	{ id: 1, name: "Alejandro Ávila", checked: true },
-	{ id: 2, name: "Victor Ávila", checked: true },
-	{ id: 3, name: "Américo González", checked: true },
-	{ id: 4, name: "Camila Borges", checked: true },
-	{ id: 5, name: "José Bracho", checked: true },
-	{ id: 6, name: "Bruno Melga", checked: false },
-	{ id: 7, name: "Carlos Arámbulo", checked: true },
-	{ id: 8, name: "Camila Borges", checked: true },
-	{ id: 9, name: "Colegio Claret", checked: true },
-	{ id: 10, name: "Luis Crespo", checked: false },
-];
-
 const Groups = () => {
 	return (
 		<NavigationContainer independent={true}>
@@ -47,6 +34,11 @@ const GroupsScreen = ({ navigation }) => {
 	const [currentStep, setCurrentStep] = useState(1);
 	const fadeAnim = useRef(new Animated.Value(1)).current;
 	const [groups, setGroups] = useState([]);
+	const [contacts, setContacts] = useState([]);
+	const [groupName, setGroupName] = useState("");
+	const [groupDescription, setGroupDescription] = useState("");
+	const [groupColor, setGroupColor] = useState(1);
+	const [updateGroups, setUpdateGroups] = useState(false);
 
 	useEffect(() => {
 		fetch(`${API_URL}:${API_PORT}/getGroups`, {
@@ -66,6 +58,7 @@ const GroupsScreen = ({ navigation }) => {
 								newGroups.push(group);
 							});
 							setGroups(newGroups);
+							setUpdateGroups(true);
 						})
 						.catch((error) => {
 							console.log("Error:", error);
@@ -84,6 +77,57 @@ const GroupsScreen = ({ navigation }) => {
 				console.log("Error:", error);
 			});
 	}, []);
+
+	useEffect(() => {
+		fetch(`${API_URL}:${API_PORT}/getContacts`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response
+						.text()
+						.then((fetchedContacts) => {
+							fetchedContacts = JSON.parse(fetchedContacts);
+							const newContacts = [];
+							fetchedContacts.contacts.forEach((contact) => {
+								if (contact.id !== 1) {
+									const contactData = {
+										id: contact.id,
+										name: contact.first_name + (contact.last_name ? " " + contact.last_name : ""),
+										checked: false,
+									};
+									newContacts.push(contactData);
+								}
+							});
+							setContacts(newContacts);
+						})
+						.catch((error) => {
+							console.log("Error:", error);
+						});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						console.log(text);
+					});
+				}
+			})
+			.catch((error) => {
+				console.log("Error:", error);
+			});
+	}, []);
+
+	useEffect(() => {
+		if (updateGroups) {
+			sortGroups();
+			setUpdateGroups(false);
+		}
+	}, [groups]);
 
 	const openModal = () => {
 		setModalVisible(true);
@@ -109,6 +153,98 @@ const GroupsScreen = ({ navigation }) => {
 				useNativeDriver: true,
 			}).start();
 		});
+	};
+
+	const sortGroups = () => {
+		// Sort the groups in groups state alphabetically by name except for the first two groups
+		const sortedGroups = [...groups];
+		sortedGroups.sort((a, b) => {
+			if (a.id === 2 || a.id === 1) {
+				return -1;
+			} else if (b.id === 2 || b.id === 1) {
+				return 1;
+			} else {
+				return a.group_name.localeCompare(b.group_name);
+			}
+		});
+		setGroups(sortedGroups);
+	};
+
+	const createGroup = () => {
+		fetch(`${API_URL}:${API_PORT}/createGroup`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				name: groupName,
+				description: groupDescription,
+				color: groupColor,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					groupContacts = [];
+					response.json().then((response) => {
+						let newContactCount = 0;
+						contacts.forEach((contact) => {
+							if (contact.checked) {
+								groupContacts.push(contact.id);
+								newContactCount++;
+							}
+						});
+						fetch(`${API_URL}:${API_PORT}/InsertMultipleContactToGroup`, {
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+							},
+							body: JSON.stringify({
+								groupId: response.group_id,
+								contactIds: groupContacts,
+							}),
+						})
+							.then((response) => {
+								if (response.status === 200) {
+									console.log("Group created successfully");
+									closeModal();
+
+									// Add the new group to the existing groups array
+									const newGroup = {
+										id: response.group_id,
+										group_name: groupName,
+										group_description: groupDescription,
+										color: groupColor,
+										contactCount: newContactCount,
+									};
+									setUpdateGroups(true);
+									setGroups([...groups, newGroup]);
+								} else if (response.status === 401) {
+									console.log("No session found");
+									navigation.navigate("SignIn");
+								} else {
+									console.log(response.status);
+									response.text().then((text) => {
+										console.log(text);
+									});
+								}
+							})
+							.catch((error) => {
+								console.log("Error:", error);
+							});
+					});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						console.log(text);
+					});
+				}
+			})
+			.catch((error) => {
+				console.log("Error:", error);
+			});
 	};
 
 	const goToPreviousStep = () => {
@@ -163,7 +299,7 @@ const GroupsScreen = ({ navigation }) => {
 				cancelButtonName={currentStep === 1 ? "Cancel" : "Back"}
 				doneButtonName={currentStep === 1 ? "Next" : "Create"}
 				cancelButtonAction={currentStep === 1 ? closeModal : goToPreviousStep}
-				doneButtonAction={currentStep === 1 ? goToNextStep : closeModal}
+				doneButtonAction={currentStep === 1 ? goToNextStep : createGroup}
 				cancelButtonColor={currentStep === 1 ? "#F50000" : "#7D7D7D"}
 				doneButtonColor="#33BE99"
 				modalContent={
@@ -172,17 +308,23 @@ const GroupsScreen = ({ navigation }) => {
 							<View style={styles.modalContainer}>
 								<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
 								<View style={styles.list}>
-									<List data={data} />
+									<List data={contacts} setExternalList={setContacts} />
 								</View>
 							</View>
 						) : (
 							<View>
 								<View style={styles.carouselContainer}>
-									<Carousel image={require("../../../../assets/images/GroupCard/Group.png")} />
+									<Carousel image={require("../../../../assets/images/GroupCard/Group.png")} setIndex={setGroupColor} />
 								</View>
 								<View style={styles.inputContact}>
-									<GrayInput placeholder="Group name" style={styles.input} />
-									<GrayInput placeholder="Description" style={styles.lastInput} height={78} borderRadius={18} />
+									<GrayInput placeholder="Group name" style={styles.input} onChangeText={setGroupName} />
+									<GrayInput
+										placeholder="Description"
+										style={styles.lastInput}
+										height={78}
+										borderRadius={18}
+										onChangeText={setGroupDescription}
+									/>
 								</View>
 							</View>
 						)}
@@ -225,7 +367,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 	},
 	groupCards: {
-		maxWidth: 800,
+		display: "flex",
 		flexDirection: "row",
 		flexWrap: "wrap",
 		justifyContent: "space-between",
