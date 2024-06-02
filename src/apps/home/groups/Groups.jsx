@@ -308,7 +308,7 @@ const GroupsScreen = ({ navigation }) => {
 							<View style={styles.modalContainer}>
 								<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
 								<View style={styles.list}>
-									<List data={contacts} setExtermalList={setContacts} />
+									<List data={contacts} setExternalList={setContacts} />
 								</View>
 							</View>
 						) : (
