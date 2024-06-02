@@ -23,8 +23,8 @@ const HomeScreen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [phoneNumbers, setPhoneNumbers] = useState([{ type: "home", countryCode: "", number: "" }]);
-    const [emails, setEmails] = useState([{ type: "home", email: "" }]);
-    const [urls, setURLs] = useState([{ type: "home", url: "" }]);
+    const [emails, setEmails] = useState([]);
+    const [urls, setURLs] = useState([]);
 
     useEffect(() => {
         fetch(`${API_URL}:${API_PORT}/getContacts`, {
@@ -173,17 +173,7 @@ const HomeScreen = ({ navigation }) => {
                             <Carousel letter={firstName ? firstName[0].toUpperCase() : "?"} />
                         </View>
                         <FlatList
-                            style={styles.phoneList}
-                            data={phoneNumbers}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item, index }) => (
-                                <PhoneInput
-                                    key={index}
-                                    phone={item}
-                                    setPhone={(newPhone) => setPhone(index, newPhone)}
-                                    removePhone={() => removePhone(index)}
-                                />
-                            )}
+                            style={styles.list}
                             ListHeaderComponent={() => (
                                 <>
                                     <GrayInput
@@ -200,25 +190,37 @@ const HomeScreen = ({ navigation }) => {
                             )}
                             ListFooterComponent={() => (
                                 <>
+                                    <Text style={styles.sectionTitle}>Phone Numbers</Text>
+                                    {phoneNumbers.map((phone, index) => (
+                                        <PhoneInput
+                                            key={index}
+                                            phone={phone}
+                                            setPhone={(newPhone) => setPhone(index, newPhone)}
+                                            removePhone={() => removePhone(index)}
+                                        />
+                                    ))}
+                                    <AddButton onPress={addPhoneNumber} buttonText="Add phone number" />
+                                    <Text style={styles.sectionTitle}>Emails</Text>
                                     {emails.map((email, index) => (
                                         <ComboInput
-										key={index}
-										options={[
-											{ label: "home", value: "home" },
-											{ label: "work", value: "work" },
-											{ label: "school", value: "school" },
-											{ label: "office", value: "office" },
-										]}
-										value={email.email}
-										selectedValue={email.type}
-										placeholder={"Email"}
-										onChangeText={(newEmail) => setEmail(index, { ...email, email: newEmail })}
-										onRemove={() => removeEmail(index)}
-										index={index}
-										onSelect={(type) => setEmail(index, { ...email, type })}
-									/>
-									
+                                            key={index}
+                                            options={[
+                                                { label: "home", value: "home" },
+                                                { label: "work", value: "work" },
+                                                { label: "school", value: "school" },
+                                                { label: "office", value: "office" },
+                                            ]}
+                                            value={email.email}
+                                            selectedValue={email.type}
+                                            placeholder={"Email"}
+                                            onChangeText={(newEmail) => setEmail(index, { ...email, email: newEmail })}
+                                            onRemove={() => removeEmail(index)}
+                                            index={index}
+                                            onSelect={(type) => setEmail(index, { ...email, type })}
+                                        />
                                     ))}
+                                    <AddButton onPress={addEmail} buttonText="Add email" />
+                                    <Text style={styles.sectionTitle}>URLs</Text>
                                     {urls.map((url, index) => (
                                         <ComboInput
                                             key={index}
@@ -237,9 +239,7 @@ const HomeScreen = ({ navigation }) => {
                                             onSelect={(type) => setURL(index, { ...url, type })}
                                         />
                                     ))}
-                                    <AddButton onPress={addPhoneNumber} buttonText="add phone number" />
-                                    <AddButton onPress={addEmail} buttonText="add email" />
-                                    <AddButton onPress={addURL} buttonText="add URL" />
+                                    <AddButton onPress={addURL} buttonText="Add URL" />
                                 </>
                             )}
                         />
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     modalContentContainer: {
         alignItems: "center",
     },
-    phoneList: {
+    list: {
         marginTop: 20,
         height: 366,
     },
@@ -335,6 +335,13 @@ const styles = StyleSheet.create({
     },
     lastInput: {
         marginBottom: 0,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontFamily: "BROmnyMedium",
+        color: "#000",
+        marginTop: 20,
+        marginBottom: 10,
     },
     userIcon: {
         position: "absolute",
