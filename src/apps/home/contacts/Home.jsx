@@ -14,6 +14,7 @@ import BlueInput from "../../../components/inputs/BlueInput";
 import GrayInput from "../../../components/inputs/GrayInput";
 import Carousel from "../../../components/Carousel";
 import CustomModal from "../../../components/modals/CustomModal";
+import DateInput from "../../../components/inputs/DateInput";
 
 const Stack = createStackNavigator();
 
@@ -25,6 +26,7 @@ const HomeScreen = ({ navigation }) => {
     const [phoneNumbers, setPhoneNumbers] = useState([{ type: "home", countryCode: "", number: "" }]);
     const [emails, setEmails] = useState([]);
     const [urls, setURLs] = useState([]);
+    const [dates, setDates] = useState([]);
 
     useEffect(() => {
         fetch(`${API_URL}:${API_PORT}/getContacts`, {
@@ -122,6 +124,22 @@ const HomeScreen = ({ navigation }) => {
         setURLs(updatedURLs);
     };
 
+    const addDate = () => {
+        setDates([...dates, { type: "birthday", date: new Date() }]);
+    }    
+
+    const setDate = (index, newDate) => {
+        const updatedDates = dates.map((date, i) =>
+            i === index ? newDate : date
+        );
+        setDates(updatedDates);
+    }
+
+    const removeDate = (index) => {
+        const updatedDates = dates.filter((_, i) => i !== index);
+        setDates(updatedDates);
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Hello</Text>
@@ -199,7 +217,7 @@ const HomeScreen = ({ navigation }) => {
                                             removePhone={() => removePhone(index)}
                                         />
                                     ))}
-                                    <AddButton onPress={addPhoneNumber} buttonText="Add phone number" />
+                                    <AddButton onPress={addPhoneNumber} buttonText="add phone number" />
                                     <Text style={styles.sectionTitle}>Emails</Text>
                                     {emails.map((email, index) => (
                                         <ComboInput
@@ -219,7 +237,7 @@ const HomeScreen = ({ navigation }) => {
                                             onSelect={(type) => setEmail(index, { ...email, type })}
                                         />
                                     ))}
-                                    <AddButton onPress={addEmail} buttonText="Add email" />
+                                    <AddButton onPress={addEmail} buttonText="add email" />
                                     <Text style={styles.sectionTitle}>URLs</Text>
                                     {urls.map((url, index) => (
                                         <ComboInput
@@ -239,7 +257,26 @@ const HomeScreen = ({ navigation }) => {
                                             onSelect={(type) => setURL(index, { ...url, type })}
                                         />
                                     ))}
-                                    <AddButton onPress={addURL} buttonText="Add URL" />
+                                    <AddButton onPress={addURL} buttonText="add URL" />
+                                    <Text style={styles.sectionTitle}>Dates</Text>
+                                    {dates.map((date, index) => (
+                                        <DateInput
+                                            key={index}
+                                            options={[
+                                                { label: "birthday", value: "birthday" },
+                                                { label: "anniversary", value: "anniversary" },
+                                                { label: "other", value: "other" },
+                                            ]}
+                                            value={date.date}
+                                            selectedValue={date.type}
+                                            placeholder={"Date"}
+                                            onRemove={() => removeDate(index)}
+                                            index={index}
+                                            onSelect={(type) => setDate(index, { ...date, type })}
+                                            onChangeText={(newDate) => setDate(index, { ...date, date: newDate })}
+                                        />
+                                    ))}
+                                    <AddButton onPress={addDate} buttonText="add date" />
                                 </>
                             )}
                         />
