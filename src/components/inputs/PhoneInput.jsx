@@ -17,7 +17,7 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
     }, [phone.type]);
 
     return (
-        <View style={styles.phoneInputContainer}>
+        <View style={[styles.phoneInputContainer, { zIndex: open ? 1000 : 1 }]}>
             <ControlButton
                 onPress={removePhone}
                 source={require("../../../assets/images/Remove.png")}
@@ -35,14 +35,16 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
                     setPhone({ ...phone, type: itemValue })
                 }
                 style={styles.picker}
-                containerStyle={{ width: 100 }}
-                dropDownContainerStyle={styles.dropDownContainer}
+                containerStyle={[styles.dropdownContainer, { zIndex: 1000 }]}
+                dropDownContainerStyle={[styles.dropDownContainer, { zIndex: 1000 }]}
                 textStyle={styles.pickerText}
+                placeholder="Select type"
             />
             <TextInput
                 style={styles.countryCodeInput}
                 placeholder="+"
                 placeholderTextColor="#7D7D7D"
+                value={phone.countryCode}
                 onChangeText={(text) =>
                     setPhone({ ...phone, countryCode: text })
                 }
@@ -67,9 +69,13 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         paddingHorizontal: 10,
     },
+    dropdownContainer: {
+        flex: 1,
+    },
     picker: {
         borderColor: "#EDEEF0",
         backgroundColor: "#EDEEF0",
+        width: 100,
     },
     dropDownContainer: {
         borderColor: "#EDEEF0",
@@ -83,7 +89,6 @@ const styles = StyleSheet.create({
         width: 30,
         marginHorizontal: 5,
         fontFamily: "BROmnyRegular",
-        textAlign: "center",
     },
     phoneNumberInput: {
         flex: 1,

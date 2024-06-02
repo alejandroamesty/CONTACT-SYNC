@@ -30,7 +30,7 @@ const ComboInput = ({
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { zIndex: open ? 1000 : 1 }]}>
             <ControlButton
                 onPress={() => onRemove(index)}
                 source={require("../../../assets/images/Remove.png")}
@@ -44,9 +44,10 @@ const ComboInput = ({
                 setOpen={setOpen}
                 setValue={handleSelectedValueChange}
                 onChangeValue={handleSelectedValueChange}
-                style={styles.dropdown}
-                textStyle={styles.dropdownText}
-                containerStyle={styles.dropdownContainer}
+                style={styles.picker}
+                containerStyle={[styles.dropdownContainer, { zIndex: 1000 }]}
+                dropDownContainerStyle={[styles.dropDownContainer, { zIndex: 1000 }]}
+                textStyle={styles.pickerText}
                 placeholder={placeholder}
             />
             <TextInput
@@ -72,12 +73,15 @@ const styles = StyleSheet.create({
     dropdownContainer: {
         flex: 1,
     },
-    dropdown: {
+    picker: {
         borderColor: "#EDEEF0",
         backgroundColor: "#EDEEF0",
-        width: 100,
+        width: "100%",
     },
-    dropdownText: {
+    dropDownContainer: {
+        borderColor: "#EDEEF0",
+    },
+    pickerText: {
         fontFamily: "BROmnyRegular",
         fontSize: 15,
         color: "#7D7D7D",
