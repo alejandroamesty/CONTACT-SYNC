@@ -50,7 +50,7 @@ const URLInput = ({ data, setData, removeData }) => {
             />
             <TextInput
                 style={styles.textInput}
-                placeholder="Email"
+                placeholder="URL"
                 placeholderTextColor="#7D7D7D"
                 value={data.dataInput}
                 onChangeText={(text) => setData({ ...data, dataInput: text })}
