@@ -3,13 +3,13 @@ import { View, TextInput, StyleSheet } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import ControlButton from "../buttons/ControlButton";
 
-const ComboInput = ({ data, setData, removeData }) => {
+const URLInput = ({ data, setData, removeData }) => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(data.type);
     const [items, setItems] = useState([
-        { id: 1, label: "home", value: "home" },
-        { id: 2, label: "work", value: "work" },
-        { id: 3, label: "school", value: "school" },
+        { id: 1, label: "website", value: "website" },
+        { id: 2, label: "Instagram", value: "Instagram" },
+        { id: 3, label: "Twitter", value: "Twitter" },
         { id: 4, label: "office", value: "office" },
         { id: 5, label: "other", value: "other" },
     ]);
@@ -50,7 +50,7 @@ const ComboInput = ({ data, setData, removeData }) => {
             />
             <TextInput
                 style={styles.textInput}
-                placeholder="Email"
+                placeholder="URL"
                 placeholderTextColor="#7D7D7D"
                 value={data.dataInput}
                 onChangeText={(text) => setData({ ...data, dataInput: text })}
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     picker: {
         borderColor: "#EDEEF0",
         backgroundColor: "#EDEEF0",
-        width: "100%",
+        width: 120,
     },
     dropDownContainer: {
         borderColor: "#EDEEF0",
@@ -86,7 +86,8 @@ const styles = StyleSheet.create({
     },
     textInput: {
         flex: 2,
-        marginHorizontal: 10,
+        marginLeft: 30,
+        width: "100%",
         fontFamily: "BROmnyRegular",
     },
     removeIcon: {
@@ -95,4 +96,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ComboInput;
+export default URLInput;
