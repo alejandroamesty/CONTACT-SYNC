@@ -7,16 +7,18 @@ const ComboInput = ({ data, setData, removeData }) => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(data.type);
     const [items, setItems] = useState([
-        { label: "home", value: "home" },
-        { label: "work", value: "work" },
-        { label: "school", value: "school" },
-        { label: "office", value: "office" },
-        { label: "other", value: "other" },
+        { id: 1, label: "home", value: "home" },
+        { id: 2, label: "work", value: "work" },
+        { id: 3, label: "school", value: "school" },
+        { id: 4, label: "office", value: "office" },
+        { id: 5, label: "other", value: "other" },
     ]);
 
     useEffect(() => {
         setValue(data.type);
     }, [data.type]);
+
+    const getSelectedItem = (value) => items.find(item => item.value === value);
 
     return (
         <View style={[styles.container, { zIndex: open ? 1000 : 1 }]}>
@@ -33,9 +35,10 @@ const ComboInput = ({ data, setData, removeData }) => {
                 setOpen={setOpen}
                 setValue={setValue}
                 setItems={setItems}
-                onChangeValue={(itemValue) =>
-                    setData({ ...data, type: itemValue })
-                }
+                onChangeValue={(itemValue) => {
+                    const selectedItem = getSelectedItem(itemValue);
+                    setData({ ...data, type: itemValue, typeId: selectedItem ? selectedItem.id : null });
+                }}
                 style={styles.picker}
                 containerStyle={[styles.dropdownContainer, { zIndex: 1000 }]}
                 dropDownContainerStyle={[
