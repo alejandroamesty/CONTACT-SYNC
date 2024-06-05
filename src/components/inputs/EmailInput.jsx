@@ -3,7 +3,7 @@ import { View, TextInput, StyleSheet } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import ControlButton from "../buttons/ControlButton";
 
-const ComboInput = ({ data, setData, removeData }) => {
+const EmailInput = ({ data, setData, removeData }) => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(data.type);
     const [items, setItems] = useState([
@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ComboInput;
+export default EmailInput;
