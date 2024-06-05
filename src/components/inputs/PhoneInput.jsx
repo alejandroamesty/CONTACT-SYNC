@@ -16,7 +16,7 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
 		setValue(phone.type);
 	}, [phone.type]);
 
-	const getSelectedItem = (value) => items.find(item => item.value === value);
+	const getSelectedItem = (value) => items.find((item) => item.value === value);
 
 	return (
 		<View style={[styles.phoneInputContainer, { zIndex: open ? 1000 : 1 }]}>
@@ -31,7 +31,7 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
 				onChangeValue={(itemValue) => {
 					setValue(itemValue);
 					const selectedItem = getSelectedItem(itemValue);
-                    setPhone({ ...phone, type: itemValue, typeId: selectedItem ? selectedItem.id : null });
+					setPhone({ ...phone, type: itemValue, phoneType: selectedItem ? selectedItem.id : null });
 				}}
 				style={styles.picker}
 				containerStyle={[styles.dropdownContainer, { zIndex: 1000 }]}
@@ -43,15 +43,15 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
 				style={styles.countryCodeInput}
 				placeholder="+"
 				placeholderTextColor="#7D7D7D"
-				value={phone.countryCode}
-				onChangeText={(text) => setPhone({ ...phone, countryCode: text })}
+				value={phone.phoneCode}
+				onChangeText={(text) => setPhone({ ...phone, phoneCode: text })}
 			/>
 			<TextInput
 				style={styles.phoneNumberInput}
 				placeholder="Phone Number"
 				placeholderTextColor="#7D7D7D"
-				value={phone.number}
-				onChangeText={(text) => setPhone({ ...phone, number: text })}
+				value={phone.phoneNumber}
+				onChangeText={(text) => setPhone({ ...phone, phoneNumber: text })}
 			/>
 		</View>
 	);
