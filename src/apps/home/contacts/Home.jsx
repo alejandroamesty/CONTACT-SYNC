@@ -93,7 +93,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addEmail = () => {
-        setEmails([...emails, { type: "home", email: "" }]);
+        setEmails([...emails, { type: "home", dataInput: "" }]);
     };
 
     const setEmail = (index, newEmail) => {
@@ -109,7 +109,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addURL = () => {
-        setURLs([...urls, { type: "home", url: "" }]);
+        setURLs([...urls, { type: "home", dataInput: "" }]);
     };
 
     const setURL = (index, newURL) => {
@@ -222,19 +222,9 @@ const HomeScreen = ({ navigation }) => {
                                     {emails.map((email, index) => (
                                         <ComboInput
                                             key={index}
-                                            options={[
-                                                { label: "home", value: "home" },
-                                                { label: "work", value: "work" },
-                                                { label: "school", value: "school" },
-                                                { label: "office", value: "office" },
-                                            ]}
-                                            value={email.email}
-                                            selectedValue={email.type}
-                                            placeholder={"Email"}
-                                            onChangeText={(newEmail) => setEmail(index, { ...email, email: newEmail })}
-                                            onRemove={() => removeEmail(index)}
-                                            index={index}
-                                            onSelect={(type) => setEmail(index, { ...email, type })}
+                                            data={email}
+                                            setData={(newEmail) => setEmail(index, newEmail)}
+                                            removeData={() => removeEmail(index)}
                                         />
                                     ))}
                                     <AddButton onPress={addEmail} buttonText="add email" />
@@ -242,19 +232,9 @@ const HomeScreen = ({ navigation }) => {
                                     {urls.map((url, index) => (
                                         <ComboInput
                                             key={index}
-                                            options={[
-                                                { label: "home", value: "home" },
-                                                { label: "work", value: "work" },
-                                                { label: "school", value: "school" },
-                                                { label: "office", value: "office" },
-                                            ]}
-                                            value={url.url}
-                                            selectedValue={url.type}
-                                            placeholder={"URL"}
-                                            onChangeText={(newURL) => setURL(index, { ...url, url: newURL })}
-                                            onRemove={() => removeURL(index)}
-                                            index={index}
-                                            onSelect={(type) => setURL(index, { ...url, type })}
+                                            data={url}
+                                            setData={(newURL) => setURL(index, newURL)}
+                                            removeData={() => removeURL(index)}
                                         />
                                     ))}
                                     <AddButton onPress={addURL} buttonText="add URL" />
@@ -269,7 +249,7 @@ const HomeScreen = ({ navigation }) => {
                                             ]}
                                             value={date.date}
                                             selectedValue={date.type}
-                                            placeholder={"Date"}
+                                            placeholder={"date"}
                                             onRemove={() => removeDate(index)}
                                             index={index}
                                             onSelect={(type) => setDate(index, { ...date, type })}
