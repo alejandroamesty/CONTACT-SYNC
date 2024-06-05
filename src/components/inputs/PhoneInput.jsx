@@ -7,14 +7,16 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState(phone.type);
 	const [items, setItems] = useState([
-		{ label: "home", value: "home" },
-		{ label: "mobile", value: "mobile" },
-		{ label: "work", value: "work" },
+		{ id: 1, label: "home", value: "home" },
+		{ id: 2, label: "mobile", value: "mobile" },
+		{ id: 3, label: "work", value: "work" },
 	]);
 
 	useEffect(() => {
 		setValue(phone.type);
 	}, [phone.type]);
+
+	const getSelectedItem = (value) => items.find(item => item.value === value);
 
 	return (
 		<View style={[styles.phoneInputContainer, { zIndex: open ? 1000 : 1 }]}>
@@ -26,7 +28,11 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
 				setOpen={setOpen}
 				setValue={setValue}
 				setItems={setItems}
-				onChangeValue={(itemValue) => setPhone({ ...phone, type: itemValue })}
+				onChangeValue={(itemValue) => {
+					setValue(itemValue);
+					const selectedItem = getSelectedItem(itemValue);
+                    setPhone({ ...phone, type: itemValue, typeId: selectedItem ? selectedItem.id : null });
+				}}
 				style={styles.picker}
 				containerStyle={[styles.dropdownContainer, { zIndex: 1000 }]}
 				dropDownContainerStyle={[styles.dropDownContainer, { zIndex: 1000 }]}
