@@ -9,7 +9,8 @@ import ControlButton from "../../../components/buttons/ControlButton";
 import ContactList from "../../../components/lists/ContactList";
 import AddButton from "../../../components/buttons/AddButton";
 import PhoneInput from "../../../components/inputs/PhoneInput";
-import ComboInput from "../../../components/inputs/ComboInput";
+import EmailInput from "../../../components/inputs/EmailInput";
+import URLInput from "../../../components/inputs/URLInput";
 import BlueInput from "../../../components/inputs/BlueInput";
 import GrayInput from "../../../components/inputs/GrayInput";
 import Carousel from "../../../components/Carousel";
@@ -124,7 +125,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addURL = () => {
-        setURLs([...urls, { type: "home", typeId: 1, dataInput: "" }]);
+        setURLs([...urls, { type: "website", typeId: 1, dataInput: "" }]);
     };
 
     const setURL = (index, newURL) => {
@@ -235,7 +236,7 @@ const HomeScreen = ({ navigation }) => {
                                     <AddButton onPress={addPhoneNumber} buttonText="add phone number" />
                                     <Text style={styles.sectionTitle}>Emails</Text>
                                     {emails.map((email, index) => (
-                                        <ComboInput
+                                        <EmailInput
                                             key={index}
                                             data={email}
                                             setData={(newEmail) => setEmail(index, newEmail)}
@@ -245,7 +246,7 @@ const HomeScreen = ({ navigation }) => {
                                     <AddButton onPress={addEmail} buttonText="add email" />
                                     <Text style={styles.sectionTitle}>URLs</Text>
                                     {urls.map((url, index) => (
-                                        <ComboInput
+                                        <URLInput
                                             key={index}
                                             data={url}
                                             setData={(newURL) => setURL(index, newURL)}
