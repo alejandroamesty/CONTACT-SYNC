@@ -5,40 +5,42 @@ import DropDownPicker from "react-native-dropdown-picker";
 import ControlButton from "../buttons/ControlButton";
 import CustomCalendarModal from "../modals/CalendarModal";
 
-const DateInput = ({
-    options = [],
-    value = "",
-    onRemove = () => {},
-    placeholder = "Seleccione una opción",
-    index = 0,
-}) => {
+const DateInput = ({ data, setData, removeData }) => {
     const [open, setOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState(value);
-    const [selectedDate, setSelectedDate] = useState(value);
+    const [selectedValue, setSelectedValue] = useState(data.type);
+    const [selectedDate, setSelectedDate] = useState(data.date);
     const [modalVisible, setModalVisible] = useState(false);
+    const [items, setItems] = useState([
+        { id: 1, label: "birthday", value: "birthday" },
+        { id: 2, label: "anniversary", value: "anniversary" },
+        { id: 3, label: "other", value: "other" },
+    ]);
 
     useEffect(() => {
-        setSelectedValue(value);
-        setSelectedDate(value);
-    }, [value]);
+        setSelectedValue(data.type);
+    }, [data.type]);
 
-    const handleSelectedValueChange = (newValue) => {
-        setSelectedValue(newValue);
-    };
+    useEffect(() => {
+        setSelectedDate(data.date);
+    }, [data.date]);
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
+        setData({ ...data, date });
         setModalVisible(false);
-    };    
+    };
 
     const formatDate = (date) => {
         return moment(date).format("DD/MM/YYYY");
     };
 
+    const getSelectedItem = (value) =>
+        items.find((item) => item.value === value);
+
     return (
         <View style={[styles.container, { zIndex: open ? 1000 : 1 }]}>
             <ControlButton
-                onPress={() => onRemove(index)}
+                onPress={removeData}
                 source={require("../../../assets/images/Remove.png")}
                 size={18}
                 style={styles.removeIcon}
@@ -46,13 +48,18 @@ const DateInput = ({
             <DropDownPicker
                 open={open}
                 value={selectedValue}
-                items={options.map((option) => ({
-                    label: option.label,
-                    value: option.value,
-                }))}
+                items={items}
                 setOpen={setOpen}
                 setValue={setSelectedValue}
-                onChangeValue={handleSelectedValueChange}
+                onChangeValue={(itemValue) => {
+                    setSelectedValue(itemValue);
+                    const selectedItem = getSelectedItem(itemValue);
+                    setData({
+                        ...data,
+                        type: itemValue,
+                        typeId: selectedItem ? selectedItem.id : null,
+                    });
+                }}
                 style={styles.picker}
                 containerStyle={[styles.dropdownContainer, { zIndex: 1000 }]}
                 dropDownContainerStyle={[
@@ -60,7 +67,7 @@ const DateInput = ({
                     { zIndex: 1000 },
                 ]}
                 textStyle={styles.pickerText}
-                placeholder={placeholder}
+                placeholder="Select type"
             />
             <CustomCalendarModal
                 visible={modalVisible}
