@@ -14,6 +14,7 @@ import BlueInput from "../../../components/inputs/BlueInput";
 import GrayInput from "../../../components/inputs/GrayInput";
 import Carousel from "../../../components/Carousel";
 import CustomModal from "../../../components/modals/CustomModal";
+import DateInput from "../../../components/inputs/DateInput";
 
 const Stack = createStackNavigator();
 
@@ -22,9 +23,10 @@ const HomeScreen = ({ navigation }) => {
     const [searchText, setSearchText] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [firstName, setFirstName] = useState("");
-    const [phoneNumbers, setPhoneNumbers] = useState([{ type: "home", countryCode: "", number: "" }]);
+    const [phoneNumbers, setPhoneNumbers] = useState([{ type: "home", typeId: 1, countryCode: "", number: "" }]);
     const [emails, setEmails] = useState([]);
     const [urls, setURLs] = useState([]);
+    const [dates, setDates] = useState([]);
 
     useEffect(() => {
         fetch(`${API_URL}:${API_PORT}/getContacts`, {
@@ -61,6 +63,21 @@ const HomeScreen = ({ navigation }) => {
             });
     }, []);
 
+    useEffect(() => {
+        phoneNumbers.forEach((phone, index) => {
+            console.log(`Phone ${index}:`, phone);
+        });
+        emails.forEach((email, index) => {
+            console.log(`Email ${index}:`, email);
+        });
+        urls.forEach((url, index) => {
+            console.log(`URL ${index}:`, url);
+        });
+        dates.forEach((date, index) => {
+            console.log(`Date ${index}:`, date);
+        });
+    }, [phoneNumbers, emails, urls, dates]);
+
     const filteredContacts = useMemo(() =>
         contacts.filter((contact) =>
             contact.first_name.toLowerCase().includes(searchText.toLowerCase())
@@ -75,7 +92,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addPhoneNumber = () => {
-        setPhoneNumbers([...phoneNumbers, { type: "home", countryCode: "", number: "" }]);
+        setPhoneNumbers([...phoneNumbers, { type: "home", typeId: 1, countryCode: "", number: "" }]);
     };
 
     const setPhone = (index, newPhone) => {
@@ -91,7 +108,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addEmail = () => {
-        setEmails([...emails, { type: "home", email: "" }]);
+        setEmails([...emails, { type: "home", typeId: 1, dataInput: "" }]);
     };
 
     const setEmail = (index, newEmail) => {
@@ -107,7 +124,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addURL = () => {
-        setURLs([...urls, { type: "home", url: "" }]);
+        setURLs([...urls, { type: "home", typeId: 1, dataInput: "" }]);
     };
 
     const setURL = (index, newURL) => {
@@ -121,6 +138,22 @@ const HomeScreen = ({ navigation }) => {
         const updatedURLs = urls.filter((_, i) => i !== index);
         setURLs(updatedURLs);
     };
+
+    const addDate = () => {
+        setDates([...dates, { type: "birthday", typeId: 1, date: new Date() }]);
+    }    
+
+    const setDate = (index, newDate) => {
+        const updatedDates = dates.map((date, i) =>
+            i === index ? newDate : date
+        );
+        setDates(updatedDates);
+    }
+
+    const removeDate = (index) => {
+        const updatedDates = dates.filter((_, i) => i !== index);
+        setDates(updatedDates);
+    }
 
     return (
         <View style={styles.container}>
@@ -174,7 +207,7 @@ const HomeScreen = ({ navigation }) => {
                         </View>
                         <FlatList
                             style={styles.list}
-                            ListHeaderComponent={() => (
+                            ListHeaderComponent={
                                 <>
                                     <GrayInput
                                         placeholder="First name"
@@ -187,8 +220,8 @@ const HomeScreen = ({ navigation }) => {
                                     <GrayInput placeholder="Company" style={styles.input} />
                                     <GrayInput placeholder="Address" style={[styles.input, styles.lastInput]} />
                                 </>
-                            )}
-                            ListFooterComponent={() => (
+                            }
+                            ListFooterComponent={
                                 <>
                                     <Text style={styles.sectionTitle}>Phone Numbers</Text>
                                     {phoneNumbers.map((phone, index) => (
@@ -199,49 +232,39 @@ const HomeScreen = ({ navigation }) => {
                                             removePhone={() => removePhone(index)}
                                         />
                                     ))}
-                                    <AddButton onPress={addPhoneNumber} buttonText="Add phone number" />
+                                    <AddButton onPress={addPhoneNumber} buttonText="add phone number" />
                                     <Text style={styles.sectionTitle}>Emails</Text>
                                     {emails.map((email, index) => (
                                         <ComboInput
                                             key={index}
-                                            options={[
-                                                { label: "home", value: "home" },
-                                                { label: "work", value: "work" },
-                                                { label: "school", value: "school" },
-                                                { label: "office", value: "office" },
-                                            ]}
-                                            value={email.email}
-                                            selectedValue={email.type}
-                                            placeholder={"Email"}
-                                            onChangeText={(newEmail) => setEmail(index, { ...email, email: newEmail })}
-                                            onRemove={() => removeEmail(index)}
-                                            index={index}
-                                            onSelect={(type) => setEmail(index, { ...email, type })}
+                                            data={email}
+                                            setData={(newEmail) => setEmail(index, newEmail)}
+                                            removeData={() => removeEmail(index)}
                                         />
                                     ))}
-                                    <AddButton onPress={addEmail} buttonText="Add email" />
+                                    <AddButton onPress={addEmail} buttonText="add email" />
                                     <Text style={styles.sectionTitle}>URLs</Text>
                                     {urls.map((url, index) => (
                                         <ComboInput
                                             key={index}
-                                            options={[
-                                                { label: "home", value: "home" },
-                                                { label: "work", value: "work" },
-                                                { label: "school", value: "school" },
-                                                { label: "office", value: "office" },
-                                            ]}
-                                            value={url.url}
-                                            selectedValue={url.type}
-                                            placeholder={"URL"}
-                                            onChangeText={(newURL) => setURL(index, { ...url, url: newURL })}
-                                            onRemove={() => removeURL(index)}
-                                            index={index}
-                                            onSelect={(type) => setURL(index, { ...url, type })}
+                                            data={url}
+                                            setData={(newURL) => setURL(index, newURL)}
+                                            removeData={() => removeURL(index)}
                                         />
                                     ))}
-                                    <AddButton onPress={addURL} buttonText="Add URL" />
+                                    <AddButton onPress={addURL} buttonText="add URL" />
+                                    <Text style={styles.sectionTitle}>Dates</Text>
+                                    {dates.map((date, index) => (
+                                        <DateInput
+                                            key={index}
+                                            data={date}
+                                            setData={(newDate) => setDate(index, newDate)}
+                                            removeData={() => removeDate(index)}
+                                        />
+                                    ))}
+                                    <AddButton onPress={addDate} buttonText="add date" />
                                 </>
-                            )}
+                            }
                         />
                     </View>
                 }
