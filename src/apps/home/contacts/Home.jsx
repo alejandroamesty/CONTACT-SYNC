@@ -23,7 +23,7 @@ const HomeScreen = ({ navigation }) => {
     const [searchText, setSearchText] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [firstName, setFirstName] = useState("");
-    const [phoneNumbers, setPhoneNumbers] = useState([{ type: "home", countryCode: "", number: "" }]);
+    const [phoneNumbers, setPhoneNumbers] = useState([{ type: "home", typeId: 1, countryCode: "", number: "" }]);
     const [emails, setEmails] = useState([]);
     const [urls, setURLs] = useState([]);
     const [dates, setDates] = useState([]);
@@ -63,6 +63,21 @@ const HomeScreen = ({ navigation }) => {
             });
     }, []);
 
+    useEffect(() => {
+        phoneNumbers.forEach((phone, index) => {
+            console.log(`Phone ${index}:`, phone);
+        });
+        emails.forEach((email, index) => {
+            console.log(`Email ${index}:`, email);
+        });
+        urls.forEach((url, index) => {
+            console.log(`URL ${index}:`, url);
+        });
+        dates.forEach((date, index) => {
+            console.log(`Date ${index}:`, date);
+        });
+    }, [phoneNumbers, emails, urls, dates]);
+
     const filteredContacts = useMemo(() =>
         contacts.filter((contact) =>
             contact.first_name.toLowerCase().includes(searchText.toLowerCase())
@@ -77,7 +92,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addPhoneNumber = () => {
-        setPhoneNumbers([...phoneNumbers, { type: "home", countryCode: "", number: "" }]);
+        setPhoneNumbers([...phoneNumbers, { type: "home", typeId: 1, countryCode: "", number: "" }]);
     };
 
     const setPhone = (index, newPhone) => {
@@ -93,7 +108,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addEmail = () => {
-        setEmails([...emails, { type: "home", dataInput: "" }]);
+        setEmails([...emails, { type: "home", typeId: 1, dataInput: "" }]);
     };
 
     const setEmail = (index, newEmail) => {
@@ -109,7 +124,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addURL = () => {
-        setURLs([...urls, { type: "home", dataInput: "" }]);
+        setURLs([...urls, { type: "home", typeId: 1, dataInput: "" }]);
     };
 
     const setURL = (index, newURL) => {
@@ -125,7 +140,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     const addDate = () => {
-        setDates([...dates, { type: "birthday", date: new Date() }]);
+        setDates([...dates, { type: "birthday", typeId: 1, date: new Date() }]);
     }    
 
     const setDate = (index, newDate) => {
@@ -192,7 +207,7 @@ const HomeScreen = ({ navigation }) => {
                         </View>
                         <FlatList
                             style={styles.list}
-                            ListHeaderComponent={() => (
+                            ListHeaderComponent={
                                 <>
                                     <GrayInput
                                         placeholder="First name"
@@ -205,8 +220,8 @@ const HomeScreen = ({ navigation }) => {
                                     <GrayInput placeholder="Company" style={styles.input} />
                                     <GrayInput placeholder="Address" style={[styles.input, styles.lastInput]} />
                                 </>
-                            )}
-                            ListFooterComponent={() => (
+                            }
+                            ListFooterComponent={
                                 <>
                                     <Text style={styles.sectionTitle}>Phone Numbers</Text>
                                     {phoneNumbers.map((phone, index) => (
@@ -242,23 +257,14 @@ const HomeScreen = ({ navigation }) => {
                                     {dates.map((date, index) => (
                                         <DateInput
                                             key={index}
-                                            options={[
-                                                { label: "birthday", value: "birthday" },
-                                                { label: "anniversary", value: "anniversary" },
-                                                { label: "other", value: "other" },
-                                            ]}
-                                            value={date.date}
-                                            selectedValue={date.type}
-                                            placeholder={"date"}
-                                            onRemove={() => removeDate(index)}
-                                            index={index}
-                                            onSelect={(type) => setDate(index, { ...date, type })}
-                                            onChangeText={(newDate) => setDate(index, { ...date, date: newDate })}
+                                            data={date}
+                                            setData={(newDate) => setDate(index, newDate)}
+                                            removeData={() => removeDate(index)}
                                         />
                                     ))}
                                     <AddButton onPress={addDate} buttonText="add date" />
                                 </>
-                            )}
+                            }
                         />
                     </View>
                 }
