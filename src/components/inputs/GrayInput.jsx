@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { TextInput, View, StyleSheet, Image } from "react-native";
 
-const GrayInput = ({ placeholder, onChangeText, value, style, image, width = 360, height = 40, fontSize = 15, borderRadius = 18 }) => {
+const GrayInput = ({ placeholder, onChangeText, defaultValue, style, image, width = 360, height = 40, fontSize = 15, borderRadius = 18 }) => {
+	const [value, setValue] = useState(defaultValue);
 	const multiline = height > 40;
-
 	return (
 		<View style={[styles.container, { width, height, borderRadius }, style]}>
 			<TextInput
@@ -12,6 +12,7 @@ const GrayInput = ({ placeholder, onChangeText, value, style, image, width = 360
 				placeholderTextColor="#7D7D7D"
 				onChangeText={(text) => {
 					if (onChangeText) onChangeText(text);
+					setValue(text);
 				}}
 				value={value}
 				multiline={multiline}
