@@ -109,7 +109,14 @@ const ContactList = ({ contacts, addToGroup, deleteContact, navigation }) => {
 					<Text style={styles.sectionHeader}>{item.title}</Text>
 					{item.data.map((contact) => (
 						<React.Fragment key={contact.id}>
-							<ContactItem contact={contact} addToGroup={addToGroup} deleteContact={deleteContact} onPress={handlePress} />
+							<ContactItem
+								contact={contact}
+								addToGroup={addToGroup}
+								deleteContact={() => {
+									if (deleteContact) deleteContact(contact.id);
+								}}
+								onPress={handlePress}
+							/>
 							{renderSeparator()}
 						</React.Fragment>
 					))}
