@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Easing, Dime
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 
-const GroupCard = ({ iconName, groupName, contactCount, backgroundColor }) => {
+const GroupCard = ({ iconName, groupName, contactCount, backgroundColor, onPress }) => {
 	const navigation = useNavigation();
 
 	const iconSource = {
@@ -43,12 +43,12 @@ const GroupCard = ({ iconName, groupName, contactCount, backgroundColor }) => {
 		}).start();
 	};
 
-	const handlePress = () => {
-		navigation.navigate("GroupDetail", { groupName });
+	const handleOnPress = () => {
+		if (onPress) onPress();
 	};
 
 	return (
-		<TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} onPress={handlePress} activeOpacity={0.8}>
+		<TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} onPress={handleOnPress} activeOpacity={0.8}>
 			<Animated.View style={{ transform: [{ scale: scaleValue }] }}>
 				<LinearGradient colors={gradientColors} style={styles.groupCard}>
 					<Image source={iconSource} style={styles.icon} />

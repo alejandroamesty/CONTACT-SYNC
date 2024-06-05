@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { StyleSheet, View, Text, ScrollView, Animated } from "react-native";
 
+import ContactDetail from "../contacts/ContactDetail";
 import ControlButton from "../../../components/buttons/ControlButton";
 import BlueInput from "../../../components/inputs/BlueInput";
 import GroupCard from "../../../components/buttons/GroupCard";
@@ -24,6 +25,7 @@ const Groups = () => {
 					{(props) => <GroupsScreen {...props} />}
 				</Stack.Screen>
 				<Stack.Screen name="GroupDetail" component={GroupDetail} options={{ headerShown: false }} />
+				<Stack.Screen name="ContactDetail" component={ContactDetail} options={{ headerShown: false }} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
@@ -286,7 +288,13 @@ const GroupsScreen = ({ navigation }) => {
 							groupName={group.group_name}
 							contactCount={group.contactCount}
 							backgroundColor={group.color}
-							onPress={() => navigation.navigate("GroupDetail", { group })}
+							onPress={() =>
+								navigation.navigate("GroupDetail", {
+									group,
+									iconName: group.id === 1 ? "Emergency" : group.id === 2 ? "Favorites" : "Group",
+									navigation,
+								})
+							}
 						/>
 					))}
 				</ScrollView>
