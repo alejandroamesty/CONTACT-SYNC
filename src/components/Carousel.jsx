@@ -14,14 +14,14 @@ const colors = [
 const ITEM_WIDTH = 121 + 30;
 const SPACER_ITEM_SIZE = (width - ITEM_WIDTH) / 2;
 
-const Carousel = ({ letter = "?", image, setIndex }) => {
+const Carousel = ({ letter = "?", image, setIndex, defaultColor }) => {
 	const scrollX = useRef(new Animated.Value(0)).current;
 	const flatListRef = useRef(null);
 	const [currentIndex, setCurrentIndex] = useState(1);
 
 	useEffect(() => {
 		if (flatListRef.current) {
-			flatListRef.current.scrollToIndex({ index: 1, animated: false });
+			flatListRef.current.scrollToIndex({ index: defaultColor || 0, animated: false });
 		}
 	}, []);
 

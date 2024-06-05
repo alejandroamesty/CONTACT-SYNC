@@ -7,14 +7,23 @@ import SmallAddButton from "../../../components/buttons/SmallAddButton";
 import CustomModal from "../../../components/modals/CustomModal";
 import GrayInput from "../../../components/inputs/GrayInput";
 import List from "../../../components/lists/List";
+import Carousel from "../../../components/Carousel";
+import NewTextButton from "../../../components/buttons/NewTextButton";
 
 const GroupDetail = ({ route }) => {
 	const [allContacts, setAllContacts] = useState([]);
 	const [contacts, setContacts] = useState([]);
 	const [searchText, setSearchText] = useState("");
+	const [newGroupName, setNewGroupName] = useState("");
+	const [newGroupDescription, setNewGroupDescription] = useState("");
+	const [groupColor, setGroupColor] = useState(1);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [editModalVisible, setEditModalVisible] = useState(false);
 	const { navigation } = route.params;
-	const { group_name, color, group_description, id } = route.params.group;
+	const { id } = route.params.group;
+	const [group_name, setGroupName] = useState(route.params.group.group_name);
+	const [group_description, setGroupDescription] = useState(route.params.group.group_description);
+	const [color, setColor] = useState(route.params.group.color);
 	const [contactCount, setContactCount] = useState(route.params.group.contactCount);
 	const iconName = route.params.iconName;
 	const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -139,6 +148,14 @@ const GroupDetail = ({ route }) => {
 		setModalVisible(false);
 	};
 
+	const openEditModal = () => {
+		setEditModalVisible(true);
+	};
+
+	const closeEditModal = () => {
+		setEditModalVisible(false);
+	};
+
 	const updateGroup = () => {
 		fetch(`${API_URL}:${API_PORT}/getContactsByGroup?id=${id}`, {
 			method: "GET",
@@ -215,6 +232,43 @@ const GroupDetail = ({ route }) => {
 			});
 	};
 
+	const editGroup = () => {
+		fetch(`${API_URL}:${API_PORT}/updateGroup`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				id: id,
+				groupName: newGroupName === "" ? group_name : newGroupName,
+				color: groupColor,
+				groupDescription: newGroupDescription,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response.text().then((text) => {
+						setGroupName(newGroupName);
+						setGroupDescription(newGroupDescription);
+						setColor(groupColor);
+						updateGroup();
+						closeEditModal();
+					});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						console.log(text);
+					});
+				}
+			})
+			.catch((error) => {
+				console.log("Error:", error);
+			});
+	};
+
 	const deleteFromGroup = () => {
 		console.log("deleteFromGroup");
 	};
@@ -225,6 +279,21 @@ const GroupDetail = ({ route }) => {
 			style={{ backgroundColor: "#030B38" }}
 			ListHeaderComponent={
 				<View style={styles.container}>
+					{id > 2 && (
+						<View style={styles.editButton}>
+							<NewTextButton onPress={openEditModal} buttonText={"Edit >"} />
+						</View>
+					)}
+
+					<View style={styles.goBackButton}>
+						<NewTextButton
+							onPress={() => {
+								navigation.navigate("Groups");
+							}}
+							buttonText={"< Back"}
+						/>
+					</View>
+
 					<View style={[styles.colorCircle, { backgroundColor: colors[color - 1].color }]}>
 						{<Image source={iconSource} style={styles.image} />}
 					</View>
@@ -274,27 +343,67 @@ const GroupDetail = ({ route }) => {
 				</View>
 			)}
 			ListFooterComponent={
-				<CustomModal
-					visible={modalVisible}
-					closeModal={closeModal}
-					title={"Add members"}
-					cancelButtonName={"Cancel"}
-					doneButtonName={"Add"}
-					cancelButtonAction={closeModal}
-					doneButtonAction={addMembers}
-					cancelButtonColor="#F50000"
-					doneButtonColor="#33BE99"
-					modalContent={
-						<Animated.View style={{ opacity: fadeAnim }}>
-							<View style={styles.modalContainer}>
-								<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
-								<View style={styles.list}>
-									<List data={allContacts} setExternalList={setAllContacts} />
+				<>
+					<CustomModal
+						visible={modalVisible}
+						closeModal={closeModal}
+						title={"Add members"}
+						cancelButtonName={"Cancel"}
+						doneButtonName={"Add"}
+						cancelButtonAction={closeModal}
+						doneButtonAction={addMembers}
+						cancelButtonColor="#F50000"
+						doneButtonColor="#33BE99"
+						modalContent={
+							<Animated.View style={{ opacity: fadeAnim }}>
+								<View style={styles.modalContainer}>
+									<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
+									<View style={styles.list}>
+										<List data={allContacts} setExternalList={setAllContacts} />
+									</View>
+								</View>
+							</Animated.View>
+						}
+					/>
+					<CustomModal
+						visible={editModalVisible}
+						closeModal={closeEditModal}
+						title={"Edit Group"}
+						cancelButtonName={"Cancel"}
+						doneButtonName={"Edit"}
+						cancelButtonAction={closeEditModal}
+						doneButtonAction={editGroup}
+						cancelButtonColor="#F50000"
+						doneButtonColor="#33BE99"
+						modalContent={
+							<View>
+								<View style={styles.carouselContainer}>
+									<Carousel
+										image={require("../../../../assets/images/GroupCard/Group.png")}
+										setIndex={setGroupColor}
+										defaultColor={color - 1}
+									/>
+								</View>
+								<View style={styles.inputContact}>
+									<GrayInput
+										placeholder={group_name}
+										style={styles.firstInput}
+										onChangeText={setNewGroupName}
+										defaultValue={group_name}
+									/>
+									<GrayInput
+										defaultValue={group_description}
+										placeholder={group_description ? group_description : ""}
+										style={styles.lastInput}
+										height={78}
+										borderRadius={18}
+										onChangeText={setNewGroupDescription}
+									/>
 								</View>
 							</View>
-						</Animated.View>
-					}
-				/>
+						}
+					/>
+				</>
 			}
 		/>
 	);
@@ -354,5 +463,29 @@ const styles = StyleSheet.create({
 		paddingRight: 20,
 		width: "100%",
 		backgroundColor: "#030B38",
+	},
+	editButton: {
+		position: "absolute",
+		right: 10,
+		top: 20,
+	},
+	goBackButton: {
+		position: "absolute",
+		left: 10,
+		top: 20,
+	},
+	carouselContainer: {
+		marginLeft: -20,
+		marginRight: -20,
+	},
+	inputContact: {
+		marginTop: 20,
+		alignSelf: "center",
+	},
+	firstInput: {
+		marginBottom: 12,
+	},
+	lastInput: {
+		marginBottom: 244,
 	},
 });
