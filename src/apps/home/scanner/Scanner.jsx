@@ -40,6 +40,15 @@ const Scanner = () => {
 
 	const colors = ["#FFAC20", "#FF7246", "#FF4574", "#FF38EB", "#0684FE", "#33BE99"];
 
+	const colorMapping = {
+		1: "#FFAC20",
+		2: "#FF7246",
+		3: "#FF4574",
+		4: "#FF38EB",
+		5: "#0684FE",
+		6: "#33BE99",
+	};
+
 	const [qrValue, setQRValue] = useState(`{
 	firstName: "",
 	lastName: "",
@@ -275,7 +284,7 @@ const Scanner = () => {
 				modalContent={
 					<View style={styles.modalContentContainer}>
 						<View style={styles.carouselContainer}>
-							<Carousel letter={firstName ? firstName[0].toUpperCase() : "?"} setIndex={setColor} defaultColor={color - 1} />
+							<Carousel letter={firstName ? firstName[0].toUpperCase() : "?"} setIndex={setColor} defaultColor={colorMapping[color]} />
 						</View>
 						<FlatList
 							style={styles.list}
