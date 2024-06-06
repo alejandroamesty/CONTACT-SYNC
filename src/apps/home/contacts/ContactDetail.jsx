@@ -496,16 +496,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     firstNameInitial: {
-        fontFamily: "BR Omny",
-        fontWeight: "500",
+        fontFamily: "BROmnyMedium",
         fontSize: 60,
         lineHeight: 79,
         textAlign: "center",
         color: "#FFFFFF",
     },
     name: {
-        fontFamily: "BR Omny",
-        fontWeight: "500",
+        fontFamily: "BROmnyMedium",
         fontSize: 25,
         marginTop: 20,
         textAlign: "center",
@@ -513,8 +511,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     alias: {
-        fontFamily: "BR Omny",
-        fontWeight: "260",
+        fontFamily: "BROmnyRegular",
         fontSize: 20,
         lineHeight: 26,
         textAlign: "center",
