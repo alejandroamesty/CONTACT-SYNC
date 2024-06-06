@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		fontFamily: "BROmnyRegular",
-		fontSize: 25,
+		fontSize: 18,
 		padding: 10,
 		color: "#0AA5FF",
 	},

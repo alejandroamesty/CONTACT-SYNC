@@ -35,6 +35,14 @@ const GroupDetail = ({ route }) => {
 		{ id: 5, color: "#0684FE" },
 		{ id: 6, color: "#33BE99" },
 	];
+	const colorMapping = {
+        1: "#FFAC20",
+        2: "#FF7246",
+        3: "#FF4574",
+        4: "#FF38EB",
+        5: "#0684FE",
+        6: "#33BE99",
+    };
 	const iconSource = {
 		Favorites: require("../../../../assets/images/GroupCard/Favorites.png"),
 		Emergency: require("../../../../assets/images/GroupCard/Emergency.png"),
@@ -381,7 +389,7 @@ const GroupDetail = ({ route }) => {
 									<Carousel
 										image={require("../../../../assets/images/GroupCard/Group.png")}
 										setIndex={setGroupColor}
-										defaultColor={color - 1}
+										defaultColor={colorMapping[color]}
 									/>
 								</View>
 								<View style={styles.inputContact}>

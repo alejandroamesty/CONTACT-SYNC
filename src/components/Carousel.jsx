@@ -19,11 +19,18 @@ const Carousel = ({ letter = "?", image, setIndex, defaultColor }) => {
 	const flatListRef = useRef(null);
 	const [currentIndex, setCurrentIndex] = useState(1);
 
-	useEffect(() => {
-		if (flatListRef.current) {
-			flatListRef.current.scrollToIndex({ index: defaultColor || 0, animated: false });
-		}
-	}, []);
+    useEffect(() => {
+        if (flatListRef.current) {
+            const defaultIndex = colors.findIndex(item => item.color === defaultColor);
+            console.log("defaultColor:", defaultColor, "defaultIndex:", defaultIndex);
+            if (defaultIndex >= 0) {
+                setTimeout(() => {
+                    flatListRef.current.scrollToIndex({ index: defaultIndex, animated: true });
+                }, 500);
+                setCurrentIndex(defaultIndex + 1);
+            }
+        }
+    }, [defaultColor]);
 
 	const getItemLayout = (data, index) => ({
 		length: ITEM_WIDTH,
