@@ -31,6 +31,7 @@ const CustomCalendarModal = ({
                             backgroundColor: "#0AA5FF",
                         }}
                         textStyle={styles.customFont}
+                        initialDate={selectedDate}
                     />
                     <TouchableOpacity
                         onPress={onClose}
