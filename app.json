@@ -1,39 +1,45 @@
 {
-  "expo": {
-    "name": "Contact Sync",
-    "slug": "contact-sync",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "icon": "./assets/images/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.alejandroamesty.contactsync"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-font"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "9429c956-ab90-4053-9c43-33a585f3b0d6"
-      }
-    }
-  }
+	"expo": {
+		"name": "Contact Sync",
+		"slug": "contact-sync",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"assetBundlePatterns": ["**/*"],
+		"icon": "./assets/images/icon.png",
+		"userInterfaceStyle": "light",
+		"splash": {
+			"image": "./assets/images/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/images/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			},
+			"package": "com.alejandroamesty.contactsync"
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		},
+		"plugins": [
+			"expo-font",
+			[
+				"expo-camera",
+				{
+					"cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+					"microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+					"recordAudioAndroid": true
+				}
+			]
+		],
+		"extra": {
+			"eas": {
+				"projectId": "9429c956-ab90-4053-9c43-33a585f3b0d6"
+			}
+		}
+	}
 }
