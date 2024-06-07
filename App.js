@@ -9,6 +9,7 @@ import * as SplashScreen from "expo-splash-screen";
 import StartScreen from "./src/apps/security/StartScreen";
 import SignIn from "./src/apps/security/SignIn";
 import SignUp from "./src/apps/security/SignUp";
+import ForgotPassword from "./src/apps/security/forgot_password/ForgotPassword";
 import MainTab from "./src/apps/home/MainTab";
 
 const Stack = createStackNavigator();
@@ -44,6 +45,7 @@ function App() {
 				<Stack.Screen name="StartScreen" component={StartScreen} options={{ headerShown: false }} />
 				<Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
 				<Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
+				<Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: false }} />
 				<Stack.Screen name="MainTab" component={MainTab} options={{ headerShown: false, gestureEnabled: false }} />
 			</Stack.Navigator>
 		</NavigationContainer>
