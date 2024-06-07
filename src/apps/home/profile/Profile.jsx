@@ -33,7 +33,7 @@ const Profile = ({ navigation }) => {
 	};
 
 	const onAccept = () => {
-		fetch(`${API_URL}:${API_PORT}/logout`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/logout`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -60,7 +60,7 @@ const Profile = ({ navigation }) => {
 	};
 
 	const onDelete = () => {
-		fetch(`${API_URL}:${API_PORT}/deleteUser`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/deleteUser`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",

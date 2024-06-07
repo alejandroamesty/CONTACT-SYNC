@@ -72,7 +72,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
     };
 
     useEffect(() => {
-        fetch(`${API_URL}:${API_PORT}/getContactById?id=${id}`, {
+        fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -464,95 +464,95 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 export default ContactDetail;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#030B38",
-        paddingLeft: 10,
-        paddingRight: 10,
-        paddingTop: 10,
-    },
-    contactContainer: {
-        alignItems: "center",
-        marginTop: 60,
-        marginBottom: 30,
-    },
-    userIcon: {
-        width: 121,
-        height: 121,
-        borderRadius: 60.5,
-        backgroundColor: "#FF6189",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    firstNameInitial: {
-        fontFamily: "BROmnyMedium",
-        fontSize: 60,
-        lineHeight: 79,
-        textAlign: "center",
-        color: "#FFFFFF",
-    },
-    name: {
-        fontFamily: "BROmnyMedium",
-        fontSize: 25,
-        marginTop: 20,
-        textAlign: "center",
-        color: "#FFFFFF",
-        marginBottom: 4,
-    },
-    alias: {
-        fontFamily: "BROmnyRegular",
-        fontSize: 20,
-        lineHeight: 26,
-        textAlign: "center",
-        color: "#737791",
-    },
-    infoContainer: {
-        alignItems: "center",
-    },
-    editButton: {
-        position: "absolute",
-        right: 10,
-        top: 20,
-    },
-    goBackButton: {
-        position: "absolute",
-        left: 10,
-        top: 20,
-    },
-    contactsContainer: {
-        position: "absolute",
-        top: 260,
-        left: 23,
-        right: 23,
-        bottom: 2,
-        overflow: "hidden",
-    },
-    carouselContainer: {
-        marginLeft: -20,
-        marginRight: -20,
-    },
-    modalContentContainer: {
-        alignItems: "center",
-    },
-    list: {
-        marginTop: 20,
-        height: 366,
-    },
-    inputContact: {
-        marginTop: 20,
-        alignSelf: "center",
-    },
-    input: {
-        marginBottom: 12,
-    },
-    lastInput: {
-        marginBottom: 0,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontFamily: "BROmnyMedium",
-        color: "#000",
-        marginTop: 20,
-        marginBottom: 10,
-    },
+	container: {
+		flex: 1,
+		backgroundColor: "#030B38",
+		paddingLeft: 10,
+		paddingRight: 10,
+		paddingTop: 10,
+	},
+	contactContainer: {
+		alignItems: "center",
+		marginTop: 60,
+		marginBottom: 30,
+	},
+	userIcon: {
+		width: 121,
+		height: 121,
+		borderRadius: 60.5,
+		backgroundColor: "#FF6189",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	firstNameInitial: {
+		fontFamily: "BROmnyMedium",
+		fontSize: 60,
+		lineHeight: 79,
+		textAlign: "center",
+		color: "#FFFFFF",
+	},
+	name: {
+		fontFamily: "BROmnyMedium",
+		fontSize: 25,
+		marginTop: 20,
+		textAlign: "center",
+		color: "#FFFFFF",
+		marginBottom: 4,
+	},
+	alias: {
+		fontFamily: "BROmnyRegular",
+		fontSize: 20,
+		lineHeight: 26,
+		textAlign: "center",
+		color: "#737791",
+	},
+	infoContainer: {
+		alignItems: "center",
+	},
+	editButton: {
+		position: "absolute",
+		right: 10,
+		top: 20,
+	},
+	goBackButton: {
+		position: "absolute",
+		left: 10,
+		top: 20,
+	},
+	contactsContainer: {
+		position: "absolute",
+		top: 260,
+		left: 23,
+		right: 23,
+		bottom: 2,
+		overflow: "hidden",
+	},
+	carouselContainer: {
+		marginLeft: -20,
+		marginRight: -20,
+	},
+	modalContentContainer: {
+		alignItems: "center",
+	},
+	list: {
+		marginTop: 20,
+		height: 366,
+	},
+	inputContact: {
+		marginTop: 20,
+		alignSelf: "center",
+	},
+	input: {
+		marginBottom: 12,
+	},
+	lastInput: {
+		marginBottom: 0,
+	},
+	sectionTitle: {
+		fontSize: 18,
+		fontFamily: "BROmnyMedium",
+		color: "#000",
+		marginTop: 20,
+		marginBottom: 10,
+	},
 });

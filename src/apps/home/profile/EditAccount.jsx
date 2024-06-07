@@ -22,7 +22,7 @@ const EditAccount = ({ navigation }) => {
 				alert("Invalid email address");
 				return;
 			}
-			fetch(`${API_URL}:${API_PORT}/updateUserEmail`, {
+			fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/updateUserEmail`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
@@ -66,7 +66,7 @@ const EditAccount = ({ navigation }) => {
 				alert("Password must be at least 8 characters long");
 				return;
 			}
-			fetch(`${API_URL}:${API_PORT}/updateUserPassword`, {
+			fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/updateUserPassword`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
