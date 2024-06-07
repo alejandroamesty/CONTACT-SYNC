@@ -141,17 +141,6 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
                                 );
                                 setURLs(formattedUrls);
                             }
-                            const phoneTypes = contact.phones.map(
-                                (phone) => phone.phone_type
-                            );
-                            const emailTypes = contact.emails.map(
-                                (email) => email.email_type
-                            );
-                            const urlTypes = contact.urls.map((url) => url.url);
-                            console.log(phoneTypes);
-                            setDisplayPhone(phoneTypes);
-                            setDisplayEmail(emailTypes);
-                            setDisplayURL(urlTypes);
                         })
                         .catch((error) => {
                             console.log("Error parsing response:", error);
