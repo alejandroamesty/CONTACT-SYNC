@@ -48,7 +48,7 @@ const ResetPassword = ({ navigation, route }) => {
 
             if (
                 response.status === 200 &&
-                responseJson.message === "Password reset successful"
+                responseJson.message === "Password updated"
             ) {
                 console.log("Password reset successful");
                 navigation.navigate("SignIn");
