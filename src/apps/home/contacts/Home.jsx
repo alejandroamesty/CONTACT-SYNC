@@ -35,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
 	const [dates, setDates] = useState([]);
 
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getContacts`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -54,6 +54,7 @@ const HomeScreen = ({ navigation }) => {
 								}
 							});
 							setContacts(newContacts);
+							console.log("Contacts:", newContacts);
 						})
 						.catch((error) => {
 							console.log("Error:", error);
@@ -180,7 +181,7 @@ const HomeScreen = ({ navigation }) => {
 			return;
 		}
 
-		fetch(`${API_URL}:${API_PORT}/createContact`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

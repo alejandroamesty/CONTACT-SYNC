@@ -36,13 +36,13 @@ const GroupDetail = ({ route }) => {
 		{ id: 6, color: "#33BE99" },
 	];
 	const colorMapping = {
-        1: "#FFAC20",
-        2: "#FF7246",
-        3: "#FF4574",
-        4: "#FF38EB",
-        5: "#0684FE",
-        6: "#33BE99",
-    };
+		1: "#FFAC20",
+		2: "#FF7246",
+		3: "#FF4574",
+		4: "#FF38EB",
+		5: "#0684FE",
+		6: "#33BE99",
+	};
 	const iconSource = {
 		Favorites: require("../../../../assets/images/GroupCard/Favorites.png"),
 		Emergency: require("../../../../assets/images/GroupCard/Emergency.png"),
@@ -50,7 +50,7 @@ const GroupDetail = ({ route }) => {
 	}[iconName];
 
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getContactsByGroup?id=${id}`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactsByGroup?id=${id}`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -89,7 +89,7 @@ const GroupDetail = ({ route }) => {
 	}, []);
 
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getContacts`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -165,7 +165,7 @@ const GroupDetail = ({ route }) => {
 	};
 
 	const updateGroup = () => {
-		fetch(`${API_URL}:${API_PORT}/getContactsByGroup?id=${id}`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactsByGroup?id=${id}`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -207,7 +207,7 @@ const GroupDetail = ({ route }) => {
 				contactSum++;
 			}
 		});
-		fetch(`${API_URL}:${API_PORT}/InsertMultipleContactToGroup`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/InsertMultipleContactToGroup`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -241,7 +241,7 @@ const GroupDetail = ({ route }) => {
 	};
 
 	const editGroup = () => {
-		fetch(`${API_URL}:${API_PORT}/updateGroup`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/updateGroup`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",

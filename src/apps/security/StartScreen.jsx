@@ -4,7 +4,7 @@ import { API_URL, API_PORT } from "@env";
 
 const StartScreen = ({ navigation }) => {
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/checkSession`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/checkSession`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",

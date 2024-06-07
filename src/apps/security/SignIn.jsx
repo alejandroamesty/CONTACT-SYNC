@@ -12,7 +12,7 @@ const SignIn = ({ navigation }) => {
 
 	const StartScreen = ({ navigation }) => {
 		useEffect(() => {
-			fetch(`${API_URL}:${API_PORT}/checkSession`, {
+			fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/checkSession`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -35,7 +35,7 @@ const SignIn = ({ navigation }) => {
 			console.log("Empty fields");
 			return;
 		}
-		fetch(`${API_URL}:${API_PORT}/login`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/login`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

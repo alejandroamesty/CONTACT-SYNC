@@ -63,7 +63,7 @@ const Scanner = () => {
 }`);
 
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getContactById?id=1`)
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=1`)
 			.then((response) => response.json())
 			.then((data) => {
 				setQRValue(
@@ -183,7 +183,7 @@ const Scanner = () => {
 			return;
 		}
 
-		fetch(`${API_URL}:${API_PORT}/createContact`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
