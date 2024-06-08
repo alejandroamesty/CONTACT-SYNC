@@ -32,6 +32,7 @@ const Profile = ({ navigation }) => {
 	const [severity, setSeverity] = useState("error");
 	const [restart, setRestart] = useState(false);
 	const [message, setMessage] = useState("");
+	const [errorMessage, setErrorMessage] = useState("");
 
 	const id = 1;
 
@@ -256,6 +257,8 @@ const Profile = ({ navigation }) => {
 			} else {
 				console.log("Error:", response.status);
 				response.text().then((text) => {
+					text = JSON.parse(text);
+					setErrorMessage(text.message);
 					console.log(text);
 				});
 			}
@@ -268,6 +271,7 @@ const Profile = ({ navigation }) => {
 
 	const closeModal = () => {
 		setEditModalVisible(false);
+		setErrorMessage("");
 	};
 
 	const addPhoneNumber = () => {
@@ -484,6 +488,7 @@ const Profile = ({ navigation }) => {
 														/>
 													))}
 													<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
+													<Text style={styles.errorMessage}>{errorMessage}</Text>
 													<Text style={styles.sectionTitle}>Emails</Text>
 													{emails.map((email, index) => (
 														<EmailInput
@@ -655,5 +660,11 @@ const styles = StyleSheet.create({
 		color: "#000",
 		marginTop: 20,
 		marginBottom: 10,
+	},
+	errorMessage: {
+		color: "#F50000",
+		fontSize: 16,
+		fontFamily: "BROmnyRegular",
+		marginTop: 10,
 	},
 });
