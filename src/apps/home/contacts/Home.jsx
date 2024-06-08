@@ -45,7 +45,6 @@ const HomeScreen = ({ navigation }) => {
 	const fadeAnim = useRef(new Animated.Value(1)).current;
 	const [contactsAndGroups, setContactsAndGroups] = useState([]);
 	const [selectedContactId, setSelectedContactId] = useState([]);
-	const [selectedContactGroup, setSelectedContactGroup] = useState([]);
 	const [allGroups, setAllGroups] = useState([]);
 
 	const colorMapping = {
@@ -168,11 +167,10 @@ const HomeScreen = ({ navigation }) => {
 		setResetItem(Date.now());
 	};
 
-	const openGroupModal = (contactId) => {
-		setSelectedContactGroup(contactId);
-		console.log("Selected contact group al abrir modal:", contactId); // Use contactId directly
-		setGroupModal(true);
-	};	
+	const openGroupModal = async (contactId) => {
+		const result = await fetchGroups(contactId);
+		if (result) setGroupModal(true);
+	};
 
 	const closeGroupModal = () => {
 		setGroupModal(false);
@@ -315,10 +313,8 @@ const HomeScreen = ({ navigation }) => {
 		})
 			.then((response) => {
 				if (response.status === 200) {
-					setContacts((prevContacts) => 
-						prevContacts.filter((contact) => contact.id !== contactId)
-					);
-					console.log(contactId)
+					setContacts((prevContacts) => prevContacts.filter((contact) => contact.id !== contactId));
+					console.log(contactId);
 					closeDeleteModal();
 				} else {
 					console.log(response.status);
@@ -331,11 +327,11 @@ const HomeScreen = ({ navigation }) => {
 				console.log("Error:", error);
 			});
 	};
-	
+
 	const onAccept = (contactId) => {
 		deleteContact(contactId);
 	};
-	
+
 	useEffect(() => {
 		fetch(`${API_URL}:${API_PORT}/getAllContactsAndGroups`, {
 			method: "GET",
@@ -343,76 +339,71 @@ const HomeScreen = ({ navigation }) => {
 				"Content-Type": "application/json",
 			},
 		})
-		.then((response) => {
+			.then((response) => {
+				if (response.status === 200) {
+					response
+						.json()
+						.then((data) => {
+							console.log("Data:", data);
+							setContactsAndGroups(data);
+						})
+						.catch((error) => {
+							console.log("Error:", error);
+						});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						console.log(text);
+					});
+				}
+			})
+			.catch((error) => {
+				console.log("Error:", error);
+			});
+	}, []);
+
+	const fetchGroups = async (id) => {
+		try {
+			const response = await fetch(`${API_URL}:${API_PORT}/getGroups`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
 			if (response.status === 200) {
-				response.json()
-				.then((data) => {
-					console.log("Data:", data);
-					setContactsAndGroups(data);
-				})
-				.catch((error) => {
-					console.log("Error:", error);
+				const fetchedGroups = await response.json();
+				const filteredGroups = fetchedGroups.groups.filter((group) => {
+					const groupContainsContact = contactsAndGroups.contacts.some((contactGroup) => {
+						return contactGroup.group_id === group.id && contactGroup.contacts.includes(id);
+					});
+					return !groupContainsContact;
 				});
+				const formattedGroups = filteredGroups.map((group) => ({
+					id: group.id,
+					name: group.group_name,
+					checked: false,
+				}));
+				setAllGroups(formattedGroups);
+				return true;
 			} else if (response.status === 401) {
 				console.log("No session found");
 				navigation.navigate("SignIn");
+				return false;
 			} else {
 				console.log(response.status);
-				response.text().then((text) => {
-					console.log(text);
-				});
+				const text = await response.text();
+				console.log(text);
+				return false;
 			}
-		})
-		.catch((error) => {
+		} catch (error) {
 			console.log("Error:", error);
-		});
-	}, []);
-	
-	useEffect(() => {
-		if (selectedContactGroup && contactsAndGroups !== null) {
-            fetch(`${API_URL}:${API_PORT}/getGroups`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            .then((response) => {
-                if (response.status === 200) {
-                    response.json()
-                    .then((fetchedGroups) => {
-                        const filteredGroups = fetchedGroups.groups.filter((group) => {
-                            const groupContainsContact = contactsAndGroups.contacts.some((contactGroup) => {
-                                return contactGroup.group_id === group.id && contactGroup.contacts.includes(selectedContactGroup);
-                            });
-                            return !groupContainsContact;
-                        });
-                        const formattedGroups = filteredGroups.map((group) => ({
-                            id: group.id,
-                            name: group.group_name,
-                            checked: false,
-                        }));
-						console.log("Selected contact en el useEffect:", selectedContactGroup)
-						console.log('Filtered groups:', allGroups);
-                        setAllGroups(formattedGroups);
-                    })
-                    .catch((error) => {
-                        console.log("Error:", error);
-                    });
-                } else if (response.status === 401) {
-                    console.log("No session found");
-                    navigation.navigate("SignIn");
-                } else {
-                    console.log(response.status);
-                    response.text().then((text) => {
-                        console.log(text);
-                    });
-                }
-            })
-            .catch((error) => {
-                console.log("Error:", error);
-            });
-        }
-    }, [selectedContactGroup, contactsAndGroups]);
+			return false;
+		}
+	};
 
 	return (
 		<View style={styles.container}>
@@ -438,7 +429,13 @@ const HomeScreen = ({ navigation }) => {
 			/>
 
 			<View style={styles.contactsContainer}>
-				<ContactList contacts={filteredContacts} addToGroup={openGroupModal} deleteContact={openDeleteModal} navigation={navigation} reset={resetItem}/>
+				<ContactList
+					contacts={filteredContacts}
+					addToGroup={openGroupModal}
+					deleteContact={openDeleteModal}
+					navigation={navigation}
+					reset={resetItem}
+				/>
 			</View>
 
 			<CustomModal
