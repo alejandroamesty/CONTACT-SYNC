@@ -327,7 +327,9 @@ const Profile = ({ navigation }) => {
 												{alias ? alias[0].toUpperCase() : firstName ? firstName[0].toUpperCase() : "?"}
 											</Text>
 										</View>
-										<Text style={styles.name}>{alias === "" ? (firstName ? `${firstName} ${lastName}` : "User") : alias}</Text>
+										<Text style={styles.name}>
+											{alias === "" ? (firstName === "" ? "User" : `${firstName} ${lastName}`) : alias}
+										</Text>
 										<Text style={styles.cardText}>My Card</Text>
 									</View>
 								</View>
