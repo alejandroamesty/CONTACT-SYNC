@@ -7,6 +7,7 @@ import { API_URL, API_PORT } from "@env";
 import BlueInput from "../../../components/inputs/BlueInput";
 import NewTextButton from "../../../components/buttons/NewTextButton";
 import QRCode from "react-native-qrcode-svg";
+import * as Svg from "react-native-svg";
 import CustomModal from "../../../components/modals/CustomModal";
 import GrayInput from "../../../components/inputs/GrayInput";
 import PhoneInput from "../../../components/inputs/PhoneInput";
