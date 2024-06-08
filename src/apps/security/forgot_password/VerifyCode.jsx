@@ -40,10 +40,6 @@ const VerifyCode = ({ navigation, route }) => {
 			console.log("Response JSON:", responseJson);
 
 			if (response.status === 200 && responseJson.response) {
-				setSeverity("success");
-				setMessage("Code verified");
-				setShowMessage(true);
-				setRestart(true);
 				navigation.navigate("ResetPassword", {
 					email,
 					code: verificationCode,

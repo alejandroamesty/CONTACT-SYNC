@@ -105,10 +105,6 @@ const EditAccount = ({ navigation: { goBack } }) => {
 			}).then((response) => {
 				switch (response.status) {
 					case 200:
-						setSeverity("success");
-						setMessage("Password updated successfully");
-						setShowMessage(true);
-						setRestart(true);
 						navigation.goBack();
 						break;
 					case 400:
