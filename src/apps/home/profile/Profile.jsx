@@ -107,7 +107,7 @@ const Profile = ({ navigation }) => {
 		setDeleteModalVisible(false);
 	};
 
-	useEffect(() => {
+	const getContact = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=1`, {
 			method: "GET",
 			headers: {
@@ -164,6 +164,10 @@ const Profile = ({ navigation }) => {
 			.catch((error) => {
 				console.log("Error:", error);
 			});
+	};
+
+	useEffect(() => {
+		getContact();
 	}, []);
 
 	const onAccept = () => {
@@ -244,6 +248,7 @@ const Profile = ({ navigation }) => {
 			}),
 		}).then((response) => {
 			if (response.status === 200) {
+				getContact();
 				response.text().then((text) => {
 					closeModal();
 				});
