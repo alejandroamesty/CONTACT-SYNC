@@ -313,7 +313,7 @@ const Profile = ({ navigation }) => {
 						<Text style={styles.title}>Profile</Text>
 
 						<View style={styles.buttons}>
-							<TouchableOpacity onPress={() => navigation.navigate("ContactDetail", { contact: yourContact })}>
+							<TouchableOpacity onPress={() => navigation.navigate("MyContactDetail", { contact: yourContact })}>
 								<View style={styles.card}>
 									<ControlButton
 										source={require("../../../../assets/images/Profile/Edit.png")}
@@ -402,6 +402,7 @@ const Profile = ({ navigation }) => {
 													value={firstName}
 													onChangeText={setFirstName}
 													defaultValue={firstName}
+													characterLimit={40}
 												/>
 												<GrayInput
 													placeholder="Last name"
@@ -409,6 +410,7 @@ const Profile = ({ navigation }) => {
 													value={lastName}
 													onChangeText={setLastName}
 													defaultValue={lastName}
+													characterLimit={40}
 												/>
 												<GrayInput
 													placeholder="Alias"
@@ -416,6 +418,7 @@ const Profile = ({ navigation }) => {
 													value={alias}
 													onChangeText={setAlias}
 													defaultValue={alias}
+													characterLimit={15}
 												/>
 												<GrayInput
 													placeholder="Company"
@@ -423,6 +426,7 @@ const Profile = ({ navigation }) => {
 													value={company}
 													onChangeText={setCompany}
 													defaultValue={company}
+													characterLimit={20}
 												/>
 												<GrayInput
 													placeholder="Address"
@@ -430,6 +434,7 @@ const Profile = ({ navigation }) => {
 													value={address}
 													onChangeText={setAddress}
 													defaultValue={address}
+													characterLimit={100}
 												/>
 											</>
 										}
@@ -496,7 +501,7 @@ const Profile = ({ navigation }) => {
 				)}
 			</Stack.Screen>
 			<Stack.Screen name="EditAccount" component={EditAccount} options={{ headerShown: false }} />
-			<Stack.Screen name="ContactDetail" component={ContactDetail} options={{ headerShown: false }} />
+			<Stack.Screen name="MyContactDetail" component={ContactDetail} options={{ headerShown: false }} />
 		</Stack.Navigator>
 	);
 };
