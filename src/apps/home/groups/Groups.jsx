@@ -36,11 +36,13 @@ const GroupsScreen = ({ navigation }) => {
 	const [currentStep, setCurrentStep] = useState(1);
 	const fadeAnim = useRef(new Animated.Value(1)).current;
 	const [groups, setGroups] = useState([]);
+	const [baseGroups, setBaseGroups] = useState([]);
 	const [contacts, setContacts] = useState([]);
 	const [groupName, setGroupName] = useState("");
 	const [groupDescription, setGroupDescription] = useState("");
 	const [groupColor, setGroupColor] = useState(1);
 	const [updateGroups, setUpdateGroups] = useState(false);
+	const [searchText, setSearchText] = useState("");
 
 	useEffect(() => {
 		const handleBackButton = () => true;
@@ -49,6 +51,14 @@ const GroupsScreen = ({ navigation }) => {
 			BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
 		};
 	}, []);
+
+	const handleChangeText = (text) => {
+		setSearchText(text);
+	};
+
+	useEffect(() => {
+		sortGroups();
+	}, [searchText]);
 
 	const fetchGroups = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {
@@ -68,6 +78,7 @@ const GroupsScreen = ({ navigation }) => {
 								newGroups.push(group);
 							});
 							setGroups(newGroups);
+							setBaseGroups(newGroups);
 							setUpdateGroups(true);
 						})
 						.catch((error) => {
@@ -170,8 +181,11 @@ const GroupsScreen = ({ navigation }) => {
 	};
 
 	const sortGroups = () => {
+		// First compare group_name with search text
 		// Sort the groups in groups state alphabetically by name except for the first two groups
-		const sortedGroups = [...groups];
+
+		const filteredGroups = baseGroups.filter((group) => group.group_name.toLowerCase().includes(searchText.toLowerCase()));
+		const sortedGroups = [...filteredGroups];
 		sortedGroups.sort((a, b) => {
 			if (a.id === 2 || a.id === 1) {
 				return -1;
@@ -280,6 +294,7 @@ const GroupsScreen = ({ navigation }) => {
 				fontSize={18}
 				image={require("../../../../assets/images/Search.png")}
 				backgroundColor="#030B38"
+				onChangeText={handleChangeText}
 			/>
 
 			<View style={styles.scrollViewContainer}>

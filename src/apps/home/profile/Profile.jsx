@@ -15,6 +15,7 @@ import DateInput from "../../../components/inputs/DateInput";
 import AddButton from "../../../components/buttons/AddButton";
 import ContactDetail from "../contacts/ContactDetail";
 import MessageBar from "../../../components/MessageBar";
+import SignIn from "../../security/SignIn";
 
 import { API_URL, API_PORT } from "@env";
 
@@ -532,6 +533,7 @@ const Profile = ({ navigation }) => {
 					</>
 				)}
 			</Stack.Screen>
+			<Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
 			<Stack.Screen name="EditAccount" component={EditAccount} options={{ headerShown: false }} />
 			<Stack.Screen name="MyContactDetail" component={ContactDetail} options={{ headerShown: false }} />
 		</Stack.Navigator>
