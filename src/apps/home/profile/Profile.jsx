@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, BackHandler } from "react-native";
 import React, { useState, useEffect } from "react";
 import ControlButton from "../../../components/buttons/ControlButton";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -77,6 +77,14 @@ const Profile = ({ navigation }) => {
 		2: "anniversary",
 		3: "other",
 	};
+
+	useEffect(() => {
+		const handleBackButton = () => true;
+		BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+		return () => {
+			BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
+		};
+	}, []);
 
 	const goToEditAccount = () => {
 		navigation.navigate("EditAccount");

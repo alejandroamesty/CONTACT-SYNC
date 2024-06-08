@@ -1,22 +1,26 @@
 {
-  "cli": {
-    "version": ">= 9.1.0"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
-      "distribution": "internal"
-    },
-    "production": {
-      "android": {
-        "buildType": "apk"
-      }
-    }
-  },
-  "submit": {
-    "production": {}
-  }
+	"cli": {
+		"version": ">= 9.1.0"
+	},
+	"build": {
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal"
+		},
+		"preview": {
+			"distribution": "internal"
+		},
+		"production": {
+			"android": {
+				"buildType": "apk"
+			},
+			"env": {
+				"API_URL": "https://contactsyncserver-production.up.railway.app",
+				"API_PORT": null
+			}
+		}
+	},
+	"submit": {
+		"production": {}
+	}
 }

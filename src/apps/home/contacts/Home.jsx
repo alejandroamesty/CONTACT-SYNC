@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { StyleSheet, View, Text, FlatList, Animated } from "react-native";
+import { StyleSheet, View, Text, FlatList, Animated, BackHandler } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { API_URL, API_PORT } from "@env";
 
@@ -55,6 +55,14 @@ const HomeScreen = ({ navigation }) => {
 		5: "#0684FE",
 		6: "#33BE99",
 	};
+
+	useEffect(() => {
+		const handleBackButton = () => true;
+		BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+		return () => {
+			BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
+		};
+	}, []);
 
 	const fetchContacts = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
