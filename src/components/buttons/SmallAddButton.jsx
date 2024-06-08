@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
 		height: 40,
 		backgroundColor: "#121B49",
 		borderRadius: 18,
-		marginTop: 12,
 		paddingHorizontal: 10,
 	},
 	icon: {

@@ -526,7 +526,7 @@ const HomeScreen = ({ navigation }) => {
 					<Animated.View style={{ opacity: fadeAnim }}>
 						<View style={styles.modalContainer}>
 							<GrayInput placeholder="Search name of group" image={require("../../../../assets/images/Search.png")} />
-							<View style={styles.list}>
+							<View style={styles.groupList}>
 								<List data={allGroups} setExternalList={setAllGroups} />
 							</View>
 						</View>
@@ -622,10 +622,14 @@ const styles = StyleSheet.create({
 	modalContainer: {
 		alignItems: "center",
 	},
-	list: {
+	groupList: {
 		width: 415,
 		height: 500,
 		marginTop: 15,
+	},
+	list: {
+		marginTop: 20,
+		height: 366,
 	},
 	inputContact: {
 		marginTop: 20,
