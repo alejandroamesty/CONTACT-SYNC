@@ -15,8 +15,8 @@
 				"buildType": "apk"
 			},
 			"env": {
-				"API_URL": "https://contactsyncserver-production.up.railway.app",
-				"API_PORT": null
+				"API_URL": ,
+				"API_PORT": 
 			}
 		}
 	},
