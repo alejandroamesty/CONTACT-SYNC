@@ -56,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
 		6: "#33BE99",
 	};
 
-	useEffect(() => {
+	const fetchContacts = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
 			method: "GET",
 			headers: {
@@ -93,6 +93,9 @@ const HomeScreen = ({ navigation }) => {
 			.catch((error) => {
 				console.log("Error:", error);
 			});
+	};
+	useEffect(() => {
+		fetchContacts();
 	}, []);
 
 	useEffect(() => {
@@ -269,23 +272,7 @@ const HomeScreen = ({ navigation }) => {
 			.then((response) => {
 				if (response.status === 200) {
 					response.text().then((text) => {
-						console.log(text);
-						setContacts([
-							...contacts,
-							{
-								id: JSON.parse(text).contactId,
-								first_name: firstName,
-								last_name: lastName,
-								alias: alias,
-								company: company,
-								address: address,
-								color: color,
-								phones: phoneNumbers,
-								emails: emails,
-								dates: newDates,
-								urls: urls,
-							},
-						]);
+						fetchContacts();
 						closeModal();
 					});
 				} else {
