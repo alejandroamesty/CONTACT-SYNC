@@ -1,14 +1,20 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import BlueInput from "../../../components/inputs/BlueInput";
 import SaveButton from "../../../components/buttons/SaveButton";
+import NewTextButton from "../../../components/buttons/NewTextButton";
+import MessageBar from "../../../components/MessageBar";
 import { API_URL, API_PORT } from "@env";
 
-const EditAccount = ({ navigation }) => {
+const EditAccount = ({ navigation: { goBack } }) => {
 	const [email, setEmail] = React.useState("");
 	const [currentPassword, setCurrentPassword] = React.useState("");
 	const [newPassword, setNewPassword] = React.useState("");
 	const [confirmPassword, setConfirmPassword] = React.useState("");
+	const [showMessage, setShowMessage] = useState(false);
+	const [severity, setSeverity] = useState("error");
+	const [restart, setRestart] = useState(false);
+	const [message, setMessage] = useState("");
 	const handleSaveChanges = () => {
 		if (email === "" && (currentPassword === "" || newPassword === "" || confirmPassword === "")) {
 			alert("Please fill all fields");
@@ -19,7 +25,10 @@ const EditAccount = ({ navigation }) => {
 		if (email !== "") {
 			let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 			if (!emailRegex.test(email)) {
-				alert("Invalid email address");
+				setSeverity("error");
+				setMessage("Invalid email address");
+				setShowMessage(true);
+				setRestart(true);
 				return;
 			}
 			fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/updateUserEmail`, {
@@ -37,20 +46,35 @@ const EditAccount = ({ navigation }) => {
 						if (newPassword === "" && confirmPassword === "") navigation.goBack();
 						break;
 					case 400:
-						alert("Missing fields");
+						setSeverity("error");
+						setMessage("Missing fields");
+						setShowMessage(true);
+						setRestart(true);
 						break;
 					case 401:
-						alert("No session found");
+						setSeverity("error");
+						setMessage("No session found");
+						setShowMessage(true);
+						setRestart(true);
 						navigation.navigate("SignIn");
 						break;
 					case 402:
-						alert("Invalid email address");
+						setSeverity("error");
+						setMessage("Invalid email");
+						setShowMessage(true);
+						setRestart(true);
 						break;
 					case 403:
-						alert("Email already in use");
+						setSeverity("error");
+						setMessage("Email already exists");
+						setShowMessage(true);
+						setRestart(true);
 						break;
 					default:
-						alert("An error occured");
+						setSeverity("error");
+						setMessage("An error occured");
+						setShowMessage(true);
+						setRestart(true);
 						break;
 				}
 			});
@@ -59,7 +83,10 @@ const EditAccount = ({ navigation }) => {
 		// check password and update password
 		if (newPassword !== "") {
 			if (newPassword !== confirmPassword) {
-				alert("Passwords do not match");
+				setSeverity("error");
+				setMessage("Passwords do not match");
+				setShowMessage(true);
+				setRestart(true);
 				return;
 			}
 			if (newPassword.length < 8) {
@@ -78,24 +105,42 @@ const EditAccount = ({ navigation }) => {
 			}).then((response) => {
 				switch (response.status) {
 					case 200:
-						alert("Password updated");
+						setSeverity("success");
+						setMessage("Password updated successfully");
+						setShowMessage(true);
+						setRestart(true);
 						navigation.goBack();
 						break;
 					case 400:
-						alert("Missing fields");
+						setSeverity("error");
+						setMessage("Missing fields");
+						setShowMessage(true);
+						setRestart(true);
 						break;
 					case 401:
-						alert("No session found");
+						setSeverity("error");
+						setMessage("No session found");
+						setShowMessage(true);
+						setRestart(true);
 						navigation.navigate("SignIn");
 						break;
 					case 402:
-						alert("Invalid password");
+						setSeverity("error");
+						setMessage("Invalid password");
+						setShowMessage(true);
+						setRestart(true);
 						break;
 					case 403:
-						alert("Password does not match");
+						setSeverity("error");
+						setMessage("Invalid new password");
+						setShowMessage(true);
+						setRestart(true);
 						break;
 					default:
-						alert("An error occured");
+						setSeverity("error");
+						setMessage("An error occured");
+						setShowMessage(true);
+						setRestart(true);
 						break;
 				}
 			});
@@ -104,6 +149,10 @@ const EditAccount = ({ navigation }) => {
 
 	return (
 		<View style={styles.container}>
+			<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
+			<View style={styles.goBackButton}>
+				<NewTextButton onPress={() => goBack()} buttonText={"< Back"} />
+			</View>
 			<Text style={styles.title}>Edit account</Text>
 
 			<Text style={styles.captionSection}>Email</Text>
@@ -206,5 +255,10 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		left: 23,
 		top: 580,
+	},
+	goBackButton: {
+		position: "absolute",
+		left: 10,
+		top: -5,
 	},
 });

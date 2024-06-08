@@ -45,7 +45,10 @@ const HomeScreen = ({ navigation }) => {
 	const fadeAnim = useRef(new Animated.Value(1)).current;
 	const [contactsAndGroups, setContactsAndGroups] = useState([]);
 	const [selectedContactId, setSelectedContactId] = useState([]);
+	const [getContactId, setContactId] = useState(0);
 	const [allGroups, setAllGroups] = useState([]);
+	const [doneClicked, setDoneClicked] = useState(false);
+	const [addToGroupClicked, setAddToGroupClicked] = useState(false);
 
 	const colorMapping = {
 		1: "#FFAC20",
@@ -156,6 +159,10 @@ const HomeScreen = ({ navigation }) => {
 	};
 
 	const closeModal = () => {
+		setPhoneNumbers([{ type: "home", phoneType: 1, phoneCode: "", phoneNumber: "" }]);
+		setEmails([]);
+		setURLs([]);
+		setDates([]);
 		setModalVisible(false);
 	};
 
@@ -179,11 +186,15 @@ const HomeScreen = ({ navigation }) => {
 
 	const openGroupModal = async (contactId) => {
 		const result = await fetchGroups(contactId);
-		if (result) setGroupModal(true);
+		if (result) {
+			setGroupModal(true);
+			setContactId(contactId);
+		}
 	};
 
 	const closeGroupModal = () => {
 		setGroupModal(false);
+		resetAllItems();
 	};
 
 	const onCancelGroup = () => {
@@ -248,6 +259,8 @@ const HomeScreen = ({ navigation }) => {
 	};
 
 	const addContact = () => {
+		if (doneClicked) return;
+		setDoneClicked(true);
 		let newDates = [];
 		dates.forEach((date, index) => {
 			newDates.push({ ...date, date: `${date.date.getDate()}-${date.date.getMonth() + 1}-${date.date.getFullYear()}` });
@@ -281,6 +294,11 @@ const HomeScreen = ({ navigation }) => {
 				if (response.status === 200) {
 					response.text().then((text) => {
 						fetchContacts();
+						setPhoneNumbers([{ type: "home", phoneType: 1, phoneCode: "", phoneNumber: "" }]);
+						setEmails([]);
+						setURLs([]);
+						setDates([]);
+						setDoneClicked(false);
 						closeModal();
 					});
 				} else {
@@ -399,10 +417,37 @@ const HomeScreen = ({ navigation }) => {
 	};
 
 	const addToGroup = async () => {
-		console.log("Adding to group");
-		console.log("Selected contact ID:", selectedContactId);
+		if (addToGroupClicked) return;
+		setAddToGroupClicked(true);
 		const selectedGroups = allGroups.filter((group) => group.checked);
-		console.log("Selected groups:", selectedGroups);
+		selectedGroups.forEach(async (group) => {
+			fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/InsertMultipleContactToGroup`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					contactIds: [getContactId],
+					groupId: group.id,
+				}),
+			})
+				.then((response) => {
+					if (response.status === 200) {
+					} else if (response.status === 401) {
+						console.log("No session found");
+						navigation.navigate("SignIn");
+					} else {
+						console.log(response.status);
+						response.text().then((text) => {
+							console.log(text);
+						});
+					}
+				})
+				.catch((error) => {
+					console.log("Error:", error);
+				});
+		});
+		closeGroupModal();
 	};
 
 	return (
@@ -457,11 +502,22 @@ const HomeScreen = ({ navigation }) => {
 							style={styles.list}
 							ListHeaderComponent={
 								<>
-									<GrayInput placeholder="First name" style={styles.input} value={firstName} onChangeText={setFirstName} characterLimit={40} />
+									<GrayInput
+										placeholder="First name"
+										style={styles.input}
+										value={firstName}
+										onChangeText={setFirstName}
+										characterLimit={40}
+									/>
 									<GrayInput placeholder="Last name" style={styles.input} onChangeText={setLastName} characterLimit={40} />
 									<GrayInput placeholder="Alias" style={styles.input} onChangeText={setAlias} characterLimit={15} />
 									<GrayInput placeholder="Company" style={styles.input} onChangeText={setCompany} characterLimit={20} />
-									<GrayInput placeholder="Address" style={[styles.input, styles.lastInput]} onChangeText={setAddress} characterLimit={100} />
+									<GrayInput
+										placeholder="Address"
+										style={[styles.input, styles.lastInput]}
+										onChangeText={setAddress}
+										characterLimit={100}
+									/>
 								</>
 							}
 							ListFooterComponent={
