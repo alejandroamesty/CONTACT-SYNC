@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { View, Text, StyleSheet, Image, Animated, FlatList } from "react-native";
 import { API_URL, API_PORT } from "@env";
-import ContactList from "../../../components/lists/ContactList";
 import BlueInput from "../../../components/inputs/BlueInput";
 import SmallAddButton from "../../../components/buttons/SmallAddButton";
 import CustomModal from "../../../components/modals/CustomModal";
@@ -9,6 +8,8 @@ import GrayInput from "../../../components/inputs/GrayInput";
 import List from "../../../components/lists/List";
 import Carousel from "../../../components/Carousel";
 import NewTextButton from "../../../components/buttons/NewTextButton";
+import GroupContactList from "../../../components/lists/GroupContactList";
+import ConfirmationModal from "../../../components/modals/ConfirmationModal";
 
 const GroupDetail = ({ route }) => {
 	const [allContacts, setAllContacts] = useState([]);
@@ -27,6 +28,10 @@ const GroupDetail = ({ route }) => {
 	const [contactCount, setContactCount] = useState(route.params.group.contactCount);
 	const iconName = route.params.iconName;
 	const fadeAnim = useRef(new Animated.Value(1)).current;
+	const [deleteModal, setDeleteModal] = useState(false);
+	const [resetItem, setResetItem] = useState(null);
+	const [selectedContactId, setSelectedContactId] = useState([]);
+	
 	const colors = [
 		{ id: 1, color: "#FFAC20" },
 		{ id: 2, color: "#FF7246" },
@@ -164,6 +169,10 @@ const GroupDetail = ({ route }) => {
 		setEditModalVisible(false);
 	};
 
+	const onAccept = (contactId) => {
+		deleteContactFromGroup(contactId);
+	};
+
 	const updateGroup = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactsByGroup?id=${id}`, {
 			method: "GET",
@@ -277,8 +286,51 @@ const GroupDetail = ({ route }) => {
 			});
 	};
 
-	const deleteFromGroup = () => {
-		console.log("deleteFromGroup");
+    const deleteContactFromGroup = (contactId) => {
+        fetch(`${API_URL}:${API_PORT}/deleteContactFromGroup`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                contactId: contactId,
+                groupId: id,
+            }),
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                    setContacts((prevContacts) => prevContacts.filter((contact) => contact.id !== contactId));
+					console.log("Contact deleted from group");
+                    console.log(contactId);
+					closeDeleteModal();
+                } else {
+                    console.log(response.status);
+                    response.text().then((text) => {
+                        console.log(text);
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log("Error:", error);
+            });
+    };
+
+	const openDeleteModal = (contactId) => {
+		setSelectedContactId(contactId);
+		setDeleteModal(true);
+	};
+
+	const closeDeleteModal = () => {
+		setDeleteModal(false);
+	};
+
+	const onCancel = () => {
+		setDeleteModal(false);
+		resetAllItems();
+	};
+
+	const resetAllItems = () => {
+		setResetItem(Date.now());
 	};
 
 	return (
@@ -333,7 +385,7 @@ const GroupDetail = ({ route }) => {
 				}
 				renderItem={() => (
 					<View style={styles.contactsContainer}>
-						<ContactList contacts={filteredContacts} addToGroup={() => {}} deleteContact={deleteFromGroup} navigation={navigation} />
+						<GroupContactList contacts={filteredContacts} deleteContactFromGroup={openDeleteModal} navigation={navigation} reset={resetItem} selectedContactId={selectedContactId} />
 					</View>
 				)}
 				ListFooterComponent={
@@ -350,9 +402,9 @@ const GroupDetail = ({ route }) => {
 							doneButtonColor="#33BE99"
 							modalContent={
 								<Animated.View style={{ opacity: fadeAnim }}>
-									<View style={styles.modalContainer}>
+									<View style={styles.groupModalContainer}>
 										<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
-										<View style={styles.list}>
+										<View style={styles.membersList}>
 											<List data={allContacts} setExternalList={setAllContacts} />
 										</View>
 									</View>
@@ -415,6 +467,16 @@ const GroupDetail = ({ route }) => {
 						buttonText={"< Back"}
 					/>
 				</View>
+				<ConfirmationModal
+					visible={deleteModal}
+					image={require("../../../../assets/images/DeleteModal.png")}
+					title="Remove contact"
+					text="Are you sure you want to remove the selected contact from this group?"
+					cancelButtonText="CANCEL"
+					acceptButtonText="ACCEPT"
+					onCancel={onCancel}
+					onAccept={() => onAccept(selectedContactId)}
+				/>
 			</View>
 		</>
 	);
@@ -513,4 +575,11 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 	},
+	groupModalContainer: {
+		alignItems: "center",
+	},
+	membersList: {
+		width: 415,
+		marginTop: 15,
+	}
 });
