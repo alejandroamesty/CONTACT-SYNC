@@ -45,6 +45,7 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
 				placeholderTextColor="#7D7D7D"
 				value={phone.phoneCode}
 				onChangeText={(text) => setPhone({ ...phone, phoneCode: text })}
+				keyboardType="numeric"
 			/>
 			<TextInput
 				style={styles.phoneNumberInput}
@@ -52,6 +53,7 @@ const PhoneInput = ({ phone, setPhone, removePhone }) => {
 				placeholderTextColor="#7D7D7D"
 				value={phone.phoneNumber}
 				onChangeText={(text) => setPhone({ ...phone, phoneNumber: text })}
+				keyboardType="numeric"
 			/>
 		</View>
 	);
