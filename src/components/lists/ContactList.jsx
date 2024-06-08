@@ -33,31 +33,31 @@ const ContactList = ({ contacts, addToGroup, deleteContact, navigation, reset })
 		return <View style={styles.contactSeparator} />;
 	};
 
-    return (
-        <FlatList
-            data={sections}
-            renderItem={({ item }) => (
-                <>
-                    <Text style={styles.sectionHeader}>{item.title}</Text>
-                    {item.data.map((contact) => (
-                        <React.Fragment key={contact.id}>
-                            <SwipeToDelete
-                                item={contact}
-                                onDeleteLeft={addToGroup}
-                                onDeleteRight={deleteContact}
-                                onPress={handlePress}
-                                reset={reset}
-                            />
-                            {renderSeparator()}
-                        </React.Fragment>
-                    ))}
-                </>
-            )}
-            keyExtractor={(item, index) => item.title + index}
-            contentContainerStyle={styles.contactList}
-            showsVerticalScrollIndicator={false}
-        />
-    );
+	return (
+		<FlatList
+			data={sections}
+			renderItem={({ item }) => (
+				<>
+					<Text style={styles.sectionHeader}>{item.title}</Text>
+					{item.data.map((contact) => (
+						<React.Fragment key={contact.id}>
+							<SwipeToDelete
+								item={contact}
+								onDeleteLeft={addToGroup}
+								onDeleteRight={deleteContact}
+								onPress={handlePress}
+								reset={reset}
+							/>
+							{renderSeparator()}
+						</React.Fragment>
+					))}
+				</>
+			)}
+			keyExtractor={(item, index) => item.title + index}
+			contentContainerStyle={styles.contactList}
+			showsVerticalScrollIndicator={false}
+		/>
+	);
 };
 
 const styles = StyleSheet.create({
