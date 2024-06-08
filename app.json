@@ -5,12 +5,12 @@
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"assetBundlePatterns": ["**/*"],
-		"icon": "./assets/images/icon.png",
+		"icon": "./assets/images/contact-sync-icon.png",
 		"userInterfaceStyle": "light",
 		"splash": {
-			"image": "./assets/images/splash.png",
+			"image": "./assets/images/contact-sync-splash.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
+			"backgroundColor": "#030B38"
 		},
 		"ios": {
 			"supportsTablet": true
@@ -18,7 +18,7 @@
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/images/adaptive-icon.png",
-				"backgroundColor": "#ffffff"
+				"backgroundColor": "#030B38"
 			},
 			"package": "com.alejandroamesty.contactsync",
 			"permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"]
