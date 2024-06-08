@@ -42,7 +42,7 @@ const GroupsScreen = ({ navigation }) => {
 	const [groupColor, setGroupColor] = useState(1);
 	const [updateGroups, setUpdateGroups] = useState(false);
 
-	useEffect(() => {
+	const fetchGroups = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {
 			method: "GET",
 			headers: {
@@ -78,6 +78,10 @@ const GroupsScreen = ({ navigation }) => {
 			.catch((error) => {
 				console.log("Error:", error);
 			});
+	};
+
+	useEffect(() => {
+		fetchGroups();
 	}, []);
 
 	useEffect(() => {
@@ -210,16 +214,7 @@ const GroupsScreen = ({ navigation }) => {
 									console.log("Group created successfully");
 									closeModal();
 
-									// Add the new group to the existing groups array
-									const newGroup = {
-										id: response.group_id,
-										group_name: groupName,
-										group_description: groupDescription,
-										color: groupColor,
-										contactCount: newContactCount,
-									};
-									setUpdateGroups(true);
-									setGroups([...groups, newGroup]);
+									fetchGroups();
 								} else if (response.status === 401) {
 									console.log("No session found");
 									navigation.navigate("SignIn");
@@ -284,7 +279,7 @@ const GroupsScreen = ({ navigation }) => {
 					{groups.map((group) => (
 						<GroupCard
 							key={group.id}
-							iconName={group.id === 1 ? "Emergency" : group.id === 2 ? "Favorites" : "Group"}
+							iconName={group.id === 2 ? "Emergency" : group.id === 1 ? "Favorites" : "Group"}
 							groupName={group.group_name}
 							contactCount={group.contactCount}
 							backgroundColor={group.color}
