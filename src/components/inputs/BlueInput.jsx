@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { TextInput, View, StyleSheet, Image, Text } from "react-native";
+import { TextInput, View, StyleSheet, Text, TouchableOpacity, Image } from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const BlueInput = ({
     placeholder,
@@ -15,6 +16,7 @@ const BlueInput = ({
     isPassword = false,
 }) => {
     const [error, setError] = useState(null);
+    const [isPasswordVisible, setIsPasswordVisible] = useState(!isPassword);
 
     const validateEmail = (text) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,10 +28,10 @@ const BlueInput = ({
         const maxLength = 20;
 
         if (text.length < minLength) {
-            return `Debe tener al menos ${minLength} carácteres`;
+            return `Must be at least ${minLength} characters`;
         }
         if (text.length > maxLength) {
-            return `Debe tener más de ${maxLength} carácteres`;
+            return `Must be no more than ${maxLength} characters`;
         }
         return null;
     };
@@ -38,7 +40,7 @@ const BlueInput = ({
         if (onChangeText) {
             onChangeText(text);
             if (type === "email" && !validateEmail(text)) {
-                setError("Correo electrónico inválido");
+                setError("Invalid email format");
             } else if (type === "password") {
                 const passwordError = validatePassword(text);
                 setError(passwordError);
@@ -62,9 +64,21 @@ const BlueInput = ({
                     placeholderTextColor="rgba(255, 255, 255, 0.5)"
                     onChangeText={handleOnChangeText}
                     value={value}
-                    secureTextEntry={isPassword || type === "password"}
+                    secureTextEntry={!isPasswordVisible && (isPassword || type === "password")}
                 />
                 {image && <Image source={image} style={styles.image} />}
+                {isPassword && (
+                    <TouchableOpacity
+                        style={styles.eyeButton}
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                    >
+                        <Icon
+                            name={isPasswordVisible ? "visibility" : "visibility-off"}
+                            size={23}
+                            color="white"
+                        />
+                    </TouchableOpacity>
+                )}
             </View>
             {error && <Text style={styles.error}>{error}</Text>}
         </View>
@@ -105,6 +119,11 @@ const styles = StyleSheet.create({
         right: 20,
         top: (55 - 23) / 2,
         zIndex: 1,
+    },
+    eyeButton: {
+        position: "absolute",
+        right: 20,
+        padding: 10,
     },
     error: {
         color: "#F4385A",

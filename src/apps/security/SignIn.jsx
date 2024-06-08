@@ -37,9 +37,6 @@ const SignIn = ({ navigation }) => {
 			.then((response) => {
 				switch (response.status) {
 					case 200:
-						setSeverity("success");
-						setMessage("Success");
-						setShowMessage(true);
 						navigation.navigate("MainTab");
 						setRestart(true);
 						break;

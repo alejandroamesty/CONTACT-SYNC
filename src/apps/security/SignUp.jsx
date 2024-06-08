@@ -98,16 +98,16 @@ const SignUp = ({ navigation }) => {
 			<Text style={styles.captionInput}>Email</Text>
 			<BlueInput placeholder="Enter your email" style={styles.emailInput} onChangeText={(text) => setEmail(text)} type="email" />
 			<Text style={styles.captionInput2}>Password</Text>
-			<BlueInput placeholder="Enter your password" style={styles.passwordInput} onChangeText={(text) => setPassword(text)} type="password" />
+			<BlueInput placeholder="Enter your password" style={styles.passwordInput} onChangeText={(text) => setPassword(text)} type="password" isPassword />
 			<Text style={styles.captionInput3}>Confirm password</Text>
 			<BlueInput
 				placeholder="Confirm your password"
 				style={styles.confirmInput}
 				onChangeText={(text) => setConfirmPassword(text)}
 				type="password"
+				isPassword
 			/>
-
-			{/* Mostrar el mensaje de error si las contraseñas no coinciden */}
+			
 			{errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
 
 			<SaveButton

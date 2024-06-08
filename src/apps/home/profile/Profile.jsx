@@ -363,6 +363,7 @@ const Profile = ({ navigation }) => {
 											source={require("../../../../assets/images/Profile/Profile.png")}
 											size={30}
 											style={styles.add}
+											onPress={goToEditAccount}
 										/>
 										<Text style={styles.text}>Edit account</Text>
 									</View>
@@ -374,6 +375,7 @@ const Profile = ({ navigation }) => {
 											source={require("../../../../assets/images/Profile/Delete.png")}
 											size={30}
 											style={styles.add}
+											onPress={handleDeleteAccount}
 										/>
 										<Text style={styles.text}>Delete my account</Text>
 									</View>
@@ -399,7 +401,7 @@ const Profile = ({ navigation }) => {
 
 								<TouchableOpacity onPress={handleLogOut}>
 									<View style={styles.button}>
-										<ControlButton source={require("../../../../assets/images/Profile/Leave.png")} size={30} style={styles.add} />
+										<ControlButton source={require("../../../../assets/images/Profile/Leave.png")} size={30} style={styles.add} onPress={handleLogOut} />
 										<Text style={styles.text}>Log out</Text>
 									</View>
 								</TouchableOpacity>

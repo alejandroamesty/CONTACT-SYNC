@@ -36,10 +36,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
 			});
 
 			if (response.status === 200) {
-				setSeverity("success");
-				setMessage("Code sent");
-				setShowMessage(true);
-				setRestart(true);
 				navigation.navigate("VerifyCode", { email });
 			} else {
 				setSeverity("error");
