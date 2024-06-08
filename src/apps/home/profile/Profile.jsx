@@ -14,6 +14,7 @@ import URLInput from "../../../components/inputs/URLInput";
 import DateInput from "../../../components/inputs/DateInput";
 import AddButton from "../../../components/buttons/AddButton";
 import ContactDetail from "../contacts/ContactDetail";
+import MessageBar from "../../../components/MessageBar";
 
 import { API_URL, API_PORT } from "@env";
 
@@ -26,6 +27,10 @@ const Profile = ({ navigation }) => {
 	const [editModalVisible, setEditModalVisible] = useState(false);
 	const [deleteEmail, setDeleteEmail] = useState("");
 	const [deletePassword, setDeletePassword] = useState("");
+	const [showMessage, setShowMessage] = useState(false);
+	const [severity, setSeverity] = useState("error");
+	const [restart, setRestart] = useState(false);
+	const [message, setMessage] = useState("");
 
 	const id = 1;
 
@@ -204,8 +209,10 @@ const Profile = ({ navigation }) => {
 					console.log("Success on delete");
 					navigation.navigate("StartScreen");
 				} else {
-					console.log("Error");
-					console.log(response.status);
+					setSeverity("error");
+					setMessage("Invalid email or password");
+					setShowMessage(true);
+					setRestart(true);
 					response.text().then((text) => {
 						console.log(text);
 					});
@@ -317,197 +324,207 @@ const Profile = ({ navigation }) => {
 		<Stack.Navigator>
 			<Stack.Screen name="ProfileScreen" options={{ headerShown: false }}>
 				{() => (
-					<View style={styles.container}>
-						<Text style={styles.title}>Profile</Text>
+					<>
+						<View style={styles.container}>
+							<Text style={styles.title}>Profile</Text>
 
-						<View style={styles.buttons}>
-							<TouchableOpacity onPress={() => navigation.navigate("MyContactDetail", { contact: yourContact })}>
-								<View style={styles.card}>
-									<ControlButton
-										source={require("../../../../assets/images/Profile/Edit.png")}
-										size={30}
-										style={styles.edit}
-										onPress={openModal}
-									/>
-									<View>
-										<View style={{ ...styles.userIcon, backgroundColor: colorMapping[color] }}>
-											<Text style={styles.firstNameInitial}>
-												{alias ? alias[0].toUpperCase() : firstName ? firstName[0].toUpperCase() : "?"}
+							<View style={styles.buttons}>
+								<TouchableOpacity onPress={() => navigation.navigate("MyContactDetail", { contact: yourContact })}>
+									<View style={styles.card}>
+										<ControlButton
+											source={require("../../../../assets/images/Profile/Edit.png")}
+											size={30}
+											style={styles.edit}
+											onPress={openModal}
+										/>
+										<View>
+											<View style={{ ...styles.userIcon, backgroundColor: colorMapping[color] }}>
+												<Text style={styles.firstNameInitial}>
+													{alias ? alias[0].toUpperCase() : firstName ? firstName[0].toUpperCase() : "?"}
+												</Text>
+											</View>
+											<Text style={styles.name}>
+												{alias === "" ? (firstName === "" ? "User" : `${firstName} ${lastName}`) : alias}
 											</Text>
+											<Text style={styles.cardText}>My Card</Text>
 										</View>
-										<Text style={styles.name}>
-											{alias === "" ? (firstName === "" ? "User" : `${firstName} ${lastName}`) : alias}
-										</Text>
-										<Text style={styles.cardText}>My Card</Text>
 									</View>
-								</View>
-							</TouchableOpacity>
+								</TouchableOpacity>
 
-							<TouchableOpacity onPress={goToEditAccount}>
-								<View style={styles.button}>
-									<ControlButton source={require("../../../../assets/images/Profile/Profile.png")} size={30} style={styles.add} />
-									<Text style={styles.text}>Edit account</Text>
-								</View>
-							</TouchableOpacity>
+								<TouchableOpacity onPress={goToEditAccount}>
+									<View style={styles.button}>
+										<ControlButton
+											source={require("../../../../assets/images/Profile/Profile.png")}
+											size={30}
+											style={styles.add}
+										/>
+										<Text style={styles.text}>Edit account</Text>
+									</View>
+								</TouchableOpacity>
 
-							<TouchableOpacity onPress={handleDeleteAccount}>
-								<View style={styles.button}>
-									<ControlButton source={require("../../../../assets/images/Profile/Delete.png")} size={30} style={styles.add} />
-									<Text style={styles.text}>Delete my account</Text>
-								</View>
-							</TouchableOpacity>
+								<TouchableOpacity onPress={handleDeleteAccount}>
+									<View style={styles.button}>
+										<ControlButton
+											source={require("../../../../assets/images/Profile/Delete.png")}
+											size={30}
+											style={styles.add}
+										/>
+										<Text style={styles.text}>Delete my account</Text>
+									</View>
+								</TouchableOpacity>
 
-							<SpecialModal
-								visible={deleteModalVisible}
-								closeModal={onCancel}
-								title="Now just a minute."
-								cancelButtonName="NEVERMIND"
-								doneButtonName="DELETE EVERYTHING"
-								cancelButtonAction={onNevermind}
-								doneButtonAction={onDelete}
-								cancelButtonColor="#7D7D7D"
-								doneButtonColor="#F74040"
+								<SpecialModal
+									visible={deleteModalVisible}
+									closeModal={onCancel}
+									title="Now just a minute."
+									cancelButtonName="NEVERMIND"
+									doneButtonName="DELETE EVERYTHING"
+									cancelButtonAction={onNevermind}
+									doneButtonAction={onDelete}
+									cancelButtonColor="#7D7D7D"
+									doneButtonColor="#F74040"
+									modalContent={
+										<View style={styles.inputDelete}>
+											<GrayInput placeholder="Email" style={styles.input} onChangeText={setDeleteEmail} />
+											<GrayInput placeholder="Password" style={styles.lastInput} onChangeText={setDeletePassword} />
+										</View>
+									}
+								/>
+
+								<TouchableOpacity onPress={handleLogOut}>
+									<View style={styles.button}>
+										<ControlButton source={require("../../../../assets/images/Profile/Leave.png")} size={30} style={styles.add} />
+										<Text style={styles.text}>Log out</Text>
+									</View>
+								</TouchableOpacity>
+							</View>
+
+							<CustomModal
+								visible={editModalVisible}
+								closeModal={closeModal}
+								title="Edit contact"
+								cancelButtonName="Cancel"
+								doneButtonName="Done"
+								cancelButtonAction={closeModal}
+								doneButtonAction={updateContact}
+								cancelButtonColor="#F50"
+								doneButtonColor="#33BE99"
 								modalContent={
-									<View style={styles.inputDelete}>
-										<GrayInput placeholder="Email" style={styles.input} onChangeText={setDeleteEmail} />
-										<GrayInput placeholder="Password" style={styles.lastInput} onChangeText={setDeletePassword} />
+									<View style={styles.modalContentContainer}>
+										<View style={styles.carouselContainer}>
+											<Carousel
+												letter={firstName ? firstName[0].toUpperCase() : "?"}
+												defaultColor={colorMapping[color]}
+												setIndex={setColor}
+											/>
+										</View>
+										<FlatList
+											style={styles.list}
+											ListHeaderComponent={
+												<>
+													<GrayInput
+														placeholder="First name"
+														style={styles.input}
+														value={firstName}
+														onChangeText={setFirstName}
+														defaultValue={firstName}
+														characterLimit={40}
+													/>
+													<GrayInput
+														placeholder="Last name"
+														style={styles.input}
+														value={lastName}
+														onChangeText={setLastName}
+														defaultValue={lastName}
+														characterLimit={40}
+													/>
+													<GrayInput
+														placeholder="Alias"
+														style={styles.input}
+														value={alias}
+														onChangeText={setAlias}
+														defaultValue={alias}
+														characterLimit={15}
+													/>
+													<GrayInput
+														placeholder="Company"
+														style={styles.input}
+														value={company}
+														onChangeText={setCompany}
+														defaultValue={company}
+														characterLimit={20}
+													/>
+													<GrayInput
+														placeholder="Address"
+														style={{ marginBottom: 0 }}
+														value={address}
+														onChangeText={setAddress}
+														defaultValue={address}
+														characterLimit={100}
+													/>
+												</>
+											}
+											ListFooterComponent={
+												<>
+													<Text style={styles.sectionTitle}>Phone Numbers</Text>
+													{phoneNumbers.map((phone, index) => (
+														<PhoneInput
+															key={index}
+															phone={phone}
+															setPhone={(newPhone) => setPhone(index, newPhone)}
+															removePhone={() => removePhone(index)}
+														/>
+													))}
+													<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
+													<Text style={styles.sectionTitle}>Emails</Text>
+													{emails.map((email, index) => (
+														<EmailInput
+															key={index}
+															data={email}
+															setData={(newEmail) => setEmail(index, newEmail)}
+															removeData={() => removeEmail(index)}
+														/>
+													))}
+													<AddButton onPress={addEmail} buttonText="add email" />
+													<Text style={styles.sectionTitle}>URLs</Text>
+													{urls.map((url, index) => (
+														<URLInput
+															key={index}
+															data={url}
+															setData={(newURL) => setURL(index, newURL)}
+															removeData={() => removeURL(index)}
+														/>
+													))}
+													<AddButton onPress={addURL} buttonText="add URL" />
+													<Text style={styles.sectionTitle}>Dates</Text>
+													{dates.map((date, index) => (
+														<DateInput
+															key={index}
+															data={date}
+															setData={(newDate) => setDate(index, newDate)}
+															removeData={() => removeDate(index)}
+														/>
+													))}
+													<AddButton onPress={addDate} buttonText="add date" />
+												</>
+											}
+										/>
 									</View>
 								}
 							/>
-
-							<TouchableOpacity onPress={handleLogOut}>
-								<View style={styles.button}>
-									<ControlButton source={require("../../../../assets/images/Profile/Leave.png")} size={30} style={styles.add} />
-									<Text style={styles.text}>Log out</Text>
-								</View>
-							</TouchableOpacity>
+							<ConfirmationModal
+								visible={modalVisible}
+								image={require("../../../../assets/images/Logout.png")}
+								title="See you soon!"
+								text="You are about to logout. Are you sure this is what you want?"
+								cancelButtonText="CANCEL"
+								acceptButtonText="ACCEPT"
+								onCancel={onCancel}
+								onAccept={onAccept}
+							/>
 						</View>
-
-						<CustomModal
-							visible={editModalVisible}
-							closeModal={closeModal}
-							title="Edit contact"
-							cancelButtonName="Cancel"
-							doneButtonName="Done"
-							cancelButtonAction={closeModal}
-							doneButtonAction={updateContact}
-							cancelButtonColor="#F50"
-							doneButtonColor="#33BE99"
-							modalContent={
-								<View style={styles.modalContentContainer}>
-									<View style={styles.carouselContainer}>
-										<Carousel
-											letter={firstName ? firstName[0].toUpperCase() : "?"}
-											defaultColor={colorMapping[color]}
-											setIndex={setColor}
-										/>
-									</View>
-									<FlatList
-										style={styles.list}
-										ListHeaderComponent={
-											<>
-												<GrayInput
-													placeholder="First name"
-													style={styles.input}
-													value={firstName}
-													onChangeText={setFirstName}
-													defaultValue={firstName}
-													characterLimit={40}
-												/>
-												<GrayInput
-													placeholder="Last name"
-													style={styles.input}
-													value={lastName}
-													onChangeText={setLastName}
-													defaultValue={lastName}
-													characterLimit={40}
-												/>
-												<GrayInput
-													placeholder="Alias"
-													style={styles.input}
-													value={alias}
-													onChangeText={setAlias}
-													defaultValue={alias}
-													characterLimit={15}
-												/>
-												<GrayInput
-													placeholder="Company"
-													style={styles.input}
-													value={company}
-													onChangeText={setCompany}
-													defaultValue={company}
-													characterLimit={20}
-												/>
-												<GrayInput
-													placeholder="Address"
-													style={{ marginBottom: 0 }}
-													value={address}
-													onChangeText={setAddress}
-													defaultValue={address}
-													characterLimit={100}
-												/>
-											</>
-										}
-										ListFooterComponent={
-											<>
-												<Text style={styles.sectionTitle}>Phone Numbers</Text>
-												{phoneNumbers.map((phone, index) => (
-													<PhoneInput
-														key={index}
-														phone={phone}
-														setPhone={(newPhone) => setPhone(index, newPhone)}
-														removePhone={() => removePhone(index)}
-													/>
-												))}
-												<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
-												<Text style={styles.sectionTitle}>Emails</Text>
-												{emails.map((email, index) => (
-													<EmailInput
-														key={index}
-														data={email}
-														setData={(newEmail) => setEmail(index, newEmail)}
-														removeData={() => removeEmail(index)}
-													/>
-												))}
-												<AddButton onPress={addEmail} buttonText="add email" />
-												<Text style={styles.sectionTitle}>URLs</Text>
-												{urls.map((url, index) => (
-													<URLInput
-														key={index}
-														data={url}
-														setData={(newURL) => setURL(index, newURL)}
-														removeData={() => removeURL(index)}
-													/>
-												))}
-												<AddButton onPress={addURL} buttonText="add URL" />
-												<Text style={styles.sectionTitle}>Dates</Text>
-												{dates.map((date, index) => (
-													<DateInput
-														key={index}
-														data={date}
-														setData={(newDate) => setDate(index, newDate)}
-														removeData={() => removeDate(index)}
-													/>
-												))}
-												<AddButton onPress={addDate} buttonText="add date" />
-											</>
-										}
-									/>
-								</View>
-							}
-						/>
-
-						<ConfirmationModal
-							visible={modalVisible}
-							image={require("../../../../assets/images/Logout.png")}
-							title="See you soon!"
-							text="You are about to logout. Are you sure this is what you want?"
-							cancelButtonText="CANCEL"
-							acceptButtonText="ACCEPT"
-							onCancel={onCancel}
-							onAccept={onAccept}
-						/>
-					</View>
+						<MessageBar severity={severity} message={message} restart={restart} setRestart={setRestart} showTime={3000} />
+					</>
 				)}
 			</Stack.Screen>
 			<Stack.Screen name="EditAccount" component={EditAccount} options={{ headerShown: false }} />
