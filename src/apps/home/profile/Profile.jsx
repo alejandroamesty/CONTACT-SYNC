@@ -13,12 +13,14 @@ import EmailInput from "../../../components/inputs/EmailInput";
 import URLInput from "../../../components/inputs/URLInput";
 import DateInput from "../../../components/inputs/DateInput";
 import AddButton from "../../../components/buttons/AddButton";
+import ContactDetail from "../contacts/ContactDetail";
 
 import { API_URL, API_PORT } from "@env";
 
 const Stack = createStackNavigator();
 
 const Profile = ({ navigation }) => {
+	const [yourContact, setContact] = useState({});
 	const [modalVisible, setModalVisible] = useState(false);
 	const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 	const [editModalVisible, setEditModalVisible] = useState(false);
@@ -104,6 +106,7 @@ const Profile = ({ navigation }) => {
 					response.text().then((text) => {
 						text = JSON.parse(text);
 						const contact = text.contact;
+						setContact(contact);
 						console.log(contact);
 						setFirstName(contact.first_name);
 						setLastName(contact.last_name);
@@ -310,7 +313,7 @@ const Profile = ({ navigation }) => {
 						<Text style={styles.title}>Profile</Text>
 
 						<View style={styles.buttons}>
-							<TouchableOpacity>
+							<TouchableOpacity onPress={() => navigation.navigate("ContactDetail", { contact: yourContact })}>
 								<View style={styles.card}>
 									<ControlButton
 										source={require("../../../../assets/images/Profile/Edit.png")}
@@ -493,6 +496,7 @@ const Profile = ({ navigation }) => {
 				)}
 			</Stack.Screen>
 			<Stack.Screen name="EditAccount" component={EditAccount} options={{ headerShown: false }} />
+			<Stack.Screen name="ContactDetail" component={ContactDetail} options={{ headerShown: false }} />
 		</Stack.Navigator>
 	);
 };

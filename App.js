@@ -39,8 +39,19 @@ function App() {
 	}
 
 	return (
-		<NavigationContainer>
-			<StatusBar barStyle="light-content" backgroundColor="#ffffff" />
+		<NavigationContainer
+			theme={{
+				dark: true,
+				colors: {
+					background: "#121B49",
+					card: "#121B49",
+					border: "#121B49",
+					primary: "#FFFFFF",
+					text: "#FFFFFF",
+				},
+			}}
+		>
+			<StatusBar barStyle="light-content" />
 			<Stack.Navigator initialRouteName="StartScreen">
 				<Stack.Screen name="StartScreen" component={StartScreen} options={{ headerShown: false }} />
 				<Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
