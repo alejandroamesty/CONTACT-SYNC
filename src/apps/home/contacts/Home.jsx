@@ -76,7 +76,6 @@ const HomeScreen = ({ navigation }) => {
 								}
 							});
 							setContacts(newContacts);
-							console.log("Contacts:", newContacts);
 						})
 						.catch((error) => {
 							console.log("Error:", error);
@@ -344,7 +343,6 @@ const HomeScreen = ({ navigation }) => {
 					response
 						.json()
 						.then((data) => {
-							console.log("Data:", data);
 							setContactsAndGroups(data);
 						})
 						.catch((error) => {
