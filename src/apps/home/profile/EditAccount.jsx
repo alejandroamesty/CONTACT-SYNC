@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
 	},
 	emailInput: {
 		position: "absolute",
-		left: 23,
+		alignSelf: "center",
 		top: 142,
 	},
 	captionSection2: {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
 	},
 	currentInput: {
 		position: "absolute",
-		left: 23,
+		alignSelf: "center",
 		top: 285,
 	},
 	captionInput2: {
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
 	},
 	passwordInput: {
 		position: "absolute",
-		left: 23,
+		alignSelf: "center",
 		top: 393,
 	},
 	captionInput3: {
@@ -248,12 +248,12 @@ const styles = StyleSheet.create({
 	},
 	confirmInput: {
 		position: "absolute",
-		left: 23,
+		alighnSelf: "center",
 		top: 501,
 	},
 	saveButton: {
 		position: "absolute",
-		left: 23,
+		alignSelf: "center",
 		top: 580,
 	},
 	goBackButton: {
