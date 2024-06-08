@@ -17,7 +17,7 @@
 		},
 		"android": {
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/adaptive-icon.png",
+				"foregroundImage": "./assets/images/contact-sync-adaptive-icon.png",
 				"backgroundColor": "#030B38"
 			},
 			"package": "com.alejandroamesty.contactsync",
