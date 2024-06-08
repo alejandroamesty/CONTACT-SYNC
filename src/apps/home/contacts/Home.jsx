@@ -165,6 +165,7 @@ const HomeScreen = ({ navigation }) => {
 		setURLs([]);
 		setDates([]);
 		setModalVisible(false);
+		setErrorMessage("");
 	};
 
 	const openDeleteModal = (contactId) => {
@@ -307,6 +308,7 @@ const HomeScreen = ({ navigation }) => {
 					response.text().then((text) => {
 						text = JSON.parse(text);
 						setErrorMessage(text.message);
+						setDoneClicked(false);
 					});
 				}
 			})
