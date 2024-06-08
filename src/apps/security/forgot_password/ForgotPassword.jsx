@@ -69,7 +69,11 @@ const ForgotPasswordScreen = ({ navigation }) => {
             <SaveButton
                 onPress={handleForgotPassword}
                 title="Continue"
-                style={styles.continueButton}
+                style={[
+                    styles.continueButton,
+                    email === "" && styles.disabledButton,
+                ]}
+                disabled={email === ""}
             />
             <TouchableOpacity
                 onPress={() => navigation.navigate("SignUp")}
@@ -237,5 +241,8 @@ const styles = StyleSheet.create({
     continueButton: {
         position: "absolute",
         top: 390,
+    },
+    disabledButton: {
+        backgroundColor: "#8C91B4",
     },
 });

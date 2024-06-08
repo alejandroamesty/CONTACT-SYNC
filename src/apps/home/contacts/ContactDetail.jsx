@@ -117,10 +117,11 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 								}));
 								setDates(formattedDates);
 								const formattedUrls = contact.urls.map((url) => ({
-									typeLabel: urlMapping[url.url_type] || "website",
-									type: url.url_type || 1,
+									typeLabel: urlMapping[url.type] || "website",
+									type: url.type || 1,
 									url: url.url || "",
 								}));
+								console.log("Formatted URLs:", formattedUrls);
 								setURLs(formattedUrls);
 							}
 						})
@@ -278,7 +279,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 						/>
 					))}
 					{displayURLs.map((url, index) => (
-						<InfoContainer key={index} name={url ? urlMapping[url.url] : "URL"} info={url.url} style={{ marginBottom: 10 }} />
+						<InfoContainer key={index} name={url ? urlMapping[url.type] : "URL"} info={url.url} style={{ marginBottom: 10 }} />
 					))}
 					{displayDates.map((date, index) => (
 						<InfoContainer key={index} name="Date" info={new Date(date.contact_date).toLocaleDateString()} style={{ marginBottom: 10 }} />
@@ -311,6 +312,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 										value={firstName}
 										onChangeText={setFirstName}
 										defaultValue={firstName}
+										characterLimit={40}
 									/>
 									<GrayInput
 										placeholder="Last name"
@@ -318,14 +320,16 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 										value={lastName}
 										onChangeText={setLastName}
 										defaultValue={lastName}
+										characterLimit={40}
 									/>
-									<GrayInput placeholder="Alias" style={styles.input} value={alias} onChangeText={setAlias} defaultValue={alias} />
+									<GrayInput placeholder="Alias" style={styles.input} value={alias} onChangeText={setAlias} defaultValue={alias} characterLimit={15} />
 									<GrayInput
 										placeholder="Company"
 										style={styles.input}
 										value={company}
 										onChangeText={setCompany}
 										defaultValue={company}
+										characterLimit={20}
 									/>
 									<GrayInput
 										placeholder="Address"
@@ -333,6 +337,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 										value={address}
 										onChangeText={setAddress}
 										defaultValue={address}
+										characterLimit={100}
 									/>
 								</>
 							}
