@@ -384,8 +384,8 @@ const styles = StyleSheet.create({
 	},
 	add: {
 		position: "absolute",
-		left: 355,
-		top: 49,
+		right: 25,
+		top: 55,
 	},
 	scrollViewContainer: {
 		flex: 1,

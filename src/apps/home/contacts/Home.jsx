@@ -657,8 +657,8 @@ const styles = StyleSheet.create({
 	},
 	add: {
 		position: "absolute",
-		left: 351,
-		top: 214,
+		right: 25,
+		top: 220,
 	},
 	contactsContainer: {
 		position: "absolute",
