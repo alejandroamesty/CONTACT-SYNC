@@ -49,6 +49,7 @@ const HomeScreen = ({ navigation }) => {
 	const [allGroups, setAllGroups] = useState([]);
 	const [doneClicked, setDoneClicked] = useState(false);
 	const [addToGroupClicked, setAddToGroupClicked] = useState(false);
+	const [errorMessage, setErrorMessage] = useState("");
 
 	const colorMapping = {
 		1: "#FFAC20",
@@ -304,7 +305,8 @@ const HomeScreen = ({ navigation }) => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						console.log(text);
+						text = JSON.parse(text);
+						setErrorMessage(text.message);
 					});
 				}
 			})
@@ -525,13 +527,14 @@ const HomeScreen = ({ navigation }) => {
 									<Text style={styles.sectionTitle}>Phone Numbers</Text>
 									{phoneNumbers.map((phone, index) => (
 										<PhoneInput
-											key={index}
-											phone={phone}
-											setPhone={(newPhone) => setPhone(index, newPhone)}
-											removePhone={() => removePhone(index)}
+										key={index}
+										phone={phone}
+										setPhone={(newPhone) => setPhone(index, newPhone)}
+										removePhone={() => removePhone(index)}
 										/>
-									))}
+										))}
 									<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
+									<Text style={styles.errorMessage}>{errorMessage}</Text>
 									<Text style={styles.sectionTitle}>Emails</Text>
 									{emails.map((email, index) => (
 										<EmailInput
@@ -723,5 +726,11 @@ const styles = StyleSheet.create({
 		fontSize: 24,
 		alignSelf: "center",
 		color: "#FFFFFF",
+	},
+	errorMessage: {
+		color: "#F50000",
+		fontSize: 16,
+		fontFamily: "BROmnyRegular",
+		marginTop: 10,
 	},
 });
