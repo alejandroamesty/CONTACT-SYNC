@@ -44,8 +44,8 @@ const GroupDetail = ({ route }) => {
 		6: "#33BE99",
 	};
 	const iconSource = {
-		Favorites: require("../../../../assets/images/GroupCard/Favorites.png"),
-		Emergency: require("../../../../assets/images/GroupCard/Emergency.png"),
+		Emergency: require("../../../../assets/images/GroupCard/Favorites.png"),
+		Favorites: require("../../../../assets/images/GroupCard/Emergency.png"),
 		Group: require("../../../../assets/images/GroupCard/Group.png"),
 	}[iconName];
 
@@ -284,7 +284,7 @@ const GroupDetail = ({ route }) => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.buttonsContainer}>
-			<View style={styles.goBackButton}>
+				<View style={styles.goBackButton}>
 					<NewTextButton
 						onPress={() => {
 							navigation.navigate("Groups");
@@ -298,13 +298,13 @@ const GroupDetail = ({ route }) => {
 					</View>
 				)}
 			</View>
-				<View style={styles.groupContainer}>
+			<View style={styles.groupContainer}>
 				<View style={[styles.colorCircle, { backgroundColor: colors[color - 1].color }]}>
 					{<Image source={iconSource} style={styles.image} />}
 				</View>
-	
+
 				<Text style={styles.groupName}>{group_name}</Text>
-	
+
 				{group_description && (
 					<View style={styles.description}>
 						<Text
@@ -319,16 +319,14 @@ const GroupDetail = ({ route }) => {
 						>
 							description
 						</Text>
-						<Text style={{ color: "#FFF", paddingLeft: 15, paddingBottom: 15, fontFamily: "BROmnyRegular" }}>
-							{group_description}
-						</Text>
+						<Text style={{ color: "#FFF", paddingLeft: 15, paddingBottom: 15, fontFamily: "BROmnyRegular" }}>{group_description}</Text>
 					</View>
 				)}
 				<View style={styles.member_addContainer}>
 					<Text style={styles.memberCount}>{`${contactCount} ` + (contactCount === 1 ? "member" : "members")}</Text>
 					<SmallAddButton onPress={openModal} buttonText={"add"} />
 				</View>
-	
+
 				<BlueInput
 					style={styles.searchInput}
 					placeholder="Search"
@@ -340,12 +338,12 @@ const GroupDetail = ({ route }) => {
 					onChangeText={setSearchText}
 					backgroundColor="#030B38"
 				/>
-				</View>
-	
+			</View>
+
 			<View style={styles.contactsContainer}>
 				<ContactList contacts={filteredContacts} addToGroup={() => {}} deleteContact={deleteFromGroup} navigation={navigation} />
 			</View>
-	
+
 			<CustomModal
 				visible={modalVisible}
 				closeModal={closeModal}
@@ -387,12 +385,7 @@ const GroupDetail = ({ route }) => {
 							/>
 						</View>
 						<View style={styles.inputContact}>
-							<GrayInput
-								placeholder={group_name}
-								style={styles.firstInput}
-								onChangeText={setNewGroupName}
-								defaultValue={group_name}
-							/>
+							<GrayInput placeholder={group_name} style={styles.firstInput} onChangeText={setNewGroupName} defaultValue={group_name} />
 							<GrayInput
 								defaultValue={group_description}
 								placeholder={group_description ? group_description : ""}
@@ -406,7 +399,7 @@ const GroupDetail = ({ route }) => {
 				}
 			/>
 		</View>
-	);	
+	);
 };
 
 export default GroupDetail;
