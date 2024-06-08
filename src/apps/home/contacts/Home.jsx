@@ -413,7 +413,7 @@ const HomeScreen = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>Hello</Text>
-			<Text style={styles.subtitle}>{yourAlias ? yourAlias : yourName}</Text>
+			<Text style={styles.subtitle}>{yourAlias ? yourAlias : yourName ? yourName : "User"}</Text>
 			<View style={{ ...styles.userIcon, backgroundColor: colorMapping[yourColor] }}>
 				<Text style={styles.firstNameInitial}>{yourAlias ? yourAlias[0].toUpperCase() : yourName ? yourName[0].toUpperCase() : "?"}</Text>
 			</View>

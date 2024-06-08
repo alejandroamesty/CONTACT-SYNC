@@ -284,7 +284,7 @@ const GroupsScreen = ({ navigation }) => {
 					{groups.map((group) => (
 						<GroupCard
 							key={group.id}
-							iconName={group.id === 1 ? "Emergency" : group.id === 2 ? "Favorites" : "Group"}
+							iconName={group.id === 2 ? "Emergency" : group.id === 1 ? "Favorites" : "Group"}
 							groupName={group.group_name}
 							contactCount={group.contactCount}
 							backgroundColor={group.color}
