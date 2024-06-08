@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { View, Text, StyleSheet, Image, Animated } from "react-native";
+import { View, Text, StyleSheet, Image, Animated, FlatList } from "react-native";
 import { API_URL, API_PORT } from "@env";
 import ContactList from "../../../components/lists/ContactList";
 import BlueInput from "../../../components/inputs/BlueInput";
@@ -44,8 +44,8 @@ const GroupDetail = ({ route }) => {
 		6: "#33BE99",
 	};
 	const iconSource = {
-		Favorites: require("../../../../assets/images/GroupCard/Favorites.png"),
-		Emergency: require("../../../../assets/images/GroupCard/Emergency.png"),
+		Emergency: require("../../../../assets/images/GroupCard/Favorites.png"),
+		Favorites: require("../../../../assets/images/GroupCard/Emergency.png"),
 		Group: require("../../../../assets/images/GroupCard/Group.png"),
 	}[iconName];
 
@@ -282,9 +282,132 @@ const GroupDetail = ({ route }) => {
 	};
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.buttonsContainer}>
-			<View style={styles.goBackButton}>
+		<>
+			<FlatList
+				data={[filteredContacts]}
+				style={{ backgroundColor: "#030B38" }}
+				ListHeaderComponent={
+					<View style={styles.container}>
+						<View style={[styles.colorCircle, { backgroundColor: colors[color - 1].color }]}>
+							{<Image source={iconSource} style={styles.image} />}
+						</View>
+
+						<Text style={styles.groupName}>{group_name}</Text>
+
+						{group_description && (
+							<View style={styles.description}>
+								<Text
+									style={{
+										color: "#FFF",
+										paddingLeft: 15,
+										paddingTop: 15,
+										paddingBottom: 5,
+										color: "#737791",
+										fontFamily: "BROmnyRegular",
+									}}
+								>
+									description
+								</Text>
+								<Text style={{ color: "#FFF", paddingLeft: 15, paddingBottom: 15, fontFamily: "BROmnyRegular" }}>
+									{group_description}
+								</Text>
+							</View>
+						)}
+						<View style={styles.member_addContainer}>
+							<Text style={styles.memberCount}>{`${contactCount} ` + (contactCount === 1 ? "member" : "members")}</Text>
+							<SmallAddButton onPress={openModal} buttonText={"add"} />
+						</View>
+
+						<BlueInput
+							style={styles.searchInput}
+							placeholder="Search"
+							width={366}
+							height={60}
+							fontSize={18}
+							image={require("../../../../assets/images/Search.png")}
+							value={searchText}
+							onChangeText={setSearchText}
+							backgroundColor="#030B38"
+						/>
+					</View>
+				}
+				renderItem={() => (
+					<View style={styles.contactsContainer}>
+						<ContactList contacts={filteredContacts} addToGroup={() => {}} deleteContact={deleteFromGroup} navigation={navigation} />
+					</View>
+				)}
+				ListFooterComponent={
+					<>
+						<CustomModal
+							visible={modalVisible}
+							closeModal={closeModal}
+							title={"Add members"}
+							cancelButtonName={"Cancel"}
+							doneButtonName={"Add"}
+							cancelButtonAction={closeModal}
+							doneButtonAction={addMembers}
+							cancelButtonColor="#F50000"
+							doneButtonColor="#33BE99"
+							modalContent={
+								<Animated.View style={{ opacity: fadeAnim }}>
+									<View style={styles.modalContainer}>
+										<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
+										<View style={styles.list}>
+											<List data={allContacts} setExternalList={setAllContacts} />
+										</View>
+									</View>
+								</Animated.View>
+							}
+						/>
+						<CustomModal
+							visible={editModalVisible}
+							closeModal={closeEditModal}
+							title={"Edit Group"}
+							cancelButtonName={"Cancel"}
+							doneButtonName={"Edit"}
+							cancelButtonAction={closeEditModal}
+							doneButtonAction={editGroup}
+							cancelButtonColor="#F50000"
+							doneButtonColor="#33BE99"
+							modalContent={
+								<View>
+									<View style={styles.carouselContainer}>
+										<Carousel
+											image={require("../../../../assets/images/GroupCard/Group.png")}
+											setIndex={setGroupColor}
+											defaultColor={colorMapping[color]}
+										/>
+									</View>
+									<View style={styles.inputContact}>
+										<GrayInput
+											placeholder={group_name}
+											style={styles.firstInput}
+											onChangeText={setNewGroupName}
+											defaultValue={group_name}
+										/>
+										<GrayInput
+											defaultValue={group_description}
+											placeholder={group_description ? group_description : ""}
+											style={styles.lastInput}
+											height={78}
+											borderRadius={18}
+											onChangeText={setNewGroupDescription}
+										/>
+									</View>
+								</View>
+							}
+						/>
+					</>
+				}
+			/>
+			<View style={{ position: "absolute", backgroundColor: "#030B38", height: 80, width: "100%" }}>
+				{id > 2 && (
+					<View style={styles.editButton}>
+						<NewTextButton onPress={openEditModal} buttonText={"Edit >"} />
+					</View>
+				)}
+
+				<View style={styles.goBackButton}>
 					<NewTextButton
 						onPress={() => {
 							navigation.navigate("Groups");
@@ -292,121 +415,9 @@ const GroupDetail = ({ route }) => {
 						buttonText={"< Back"}
 					/>
 				</View>
-				{id > 2 && (
-					<View style={styles.editButton}>
-						<NewTextButton onPress={openEditModal} buttonText={"Edit"} />
-					</View>
-				)}
 			</View>
-				<View style={styles.groupContainer}>
-				<View style={[styles.colorCircle, { backgroundColor: colors[color - 1].color }]}>
-					{<Image source={iconSource} style={styles.image} />}
-				</View>
-	
-				<Text style={styles.groupName}>{group_name}</Text>
-	
-				{group_description && (
-					<View style={styles.description}>
-						<Text
-							style={{
-								color: "#FFF",
-								paddingLeft: 15,
-								paddingTop: 15,
-								paddingBottom: 5,
-								color: "#737791",
-								fontFamily: "BROmnyRegular",
-							}}
-						>
-							description
-						</Text>
-						<Text style={{ color: "#FFF", paddingLeft: 15, paddingBottom: 15, fontFamily: "BROmnyRegular" }}>
-							{group_description}
-						</Text>
-					</View>
-				)}
-				<View style={styles.member_addContainer}>
-					<Text style={styles.memberCount}>{`${contactCount} ` + (contactCount === 1 ? "member" : "members")}</Text>
-					<SmallAddButton onPress={openModal} buttonText={"add"} />
-				</View>
-	
-				<BlueInput
-					style={styles.searchInput}
-					placeholder="Search"
-					width={366}
-					height={60}
-					fontSize={18}
-					image={require("../../../../assets/images/Search.png")}
-					value={searchText}
-					onChangeText={setSearchText}
-					backgroundColor="#030B38"
-				/>
-				</View>
-	
-			<View style={styles.contactsContainer}>
-				<ContactList contacts={filteredContacts} addToGroup={() => {}} deleteContact={deleteFromGroup} navigation={navigation} />
-			</View>
-	
-			<CustomModal
-				visible={modalVisible}
-				closeModal={closeModal}
-				title={"Add members"}
-				cancelButtonName={"Cancel"}
-				doneButtonName={"Add"}
-				cancelButtonAction={closeModal}
-				doneButtonAction={addMembers}
-				cancelButtonColor="#F50000"
-				doneButtonColor="#33BE99"
-				modalContent={
-					<Animated.View style={{ opacity: fadeAnim }}>
-						<View style={styles.modalContainer}>
-							<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
-							<View style={styles.list}>
-								<List data={allContacts} setExternalList={setAllContacts} />
-							</View>
-						</View>
-					</Animated.View>
-				}
-			/>
-			<CustomModal
-				visible={editModalVisible}
-				closeModal={closeEditModal}
-				title={"Edit Group"}
-				cancelButtonName={"Cancel"}
-				doneButtonName={"Edit"}
-				cancelButtonAction={closeEditModal}
-				doneButtonAction={editGroup}
-				cancelButtonColor="#F50000"
-				doneButtonColor="#33BE99"
-				modalContent={
-					<View>
-						<View style={styles.carouselContainer}>
-							<Carousel
-								image={require("../../../../assets/images/GroupCard/Group.png")}
-								setIndex={setGroupColor}
-								defaultColor={colorMapping[color]}
-							/>
-						</View>
-						<View style={styles.inputContact}>
-							<GrayInput
-								placeholder={group_name}
-								style={styles.firstInput}
-								onChangeText={setNewGroupName}
-								defaultValue={group_name}
-							/>
-							<GrayInput
-								defaultValue={group_description}
-								placeholder={group_description ? group_description : ""}
-								style={styles.lastInput}
-								height={78}
-								borderRadius={18}
-								onChangeText={setNewGroupDescription}
-							/>
-						</View>
-					</View>
-				}
-			/>
-		</View>
-	);	
+		</>
+	);
 };
 
 export default GroupDetail;
@@ -414,6 +425,8 @@ export default GroupDetail;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		padding: 20,
+		alignItems: "center",
 		backgroundColor: "#030B38",
 		paddingLeft: 10,
 		paddingRight: 10,
@@ -429,6 +442,7 @@ const styles = StyleSheet.create({
 		borderRadius: 60.5,
 		alignItems: "center",
 		justifyContent: "center",
+		marginTop: 60,
 	},
 	image: {
 		width: 50,
@@ -441,7 +455,8 @@ const styles = StyleSheet.create({
 		width: "100%",
 		justifyContent: "space-between",
 		alignItems: "center",
-		paddingTop: 20,
+		paddingTop: 15,
+		paddingLeft: "5%",
 		paddingBottom: 15,
 		marginBottom: 10,
 		paddingRight: "4%",
@@ -460,21 +475,19 @@ const styles = StyleSheet.create({
 		borderRadius: 18,
 	},
 	contactsContainer: {
-		position: "absolute",
-		top: "62%",
-		left: 23,
-		right: 23,
-		bottom: 2,
+		paddingLeft: 20,
+		paddingRight: 20,
+		width: "100%",
 		backgroundColor: "#030B38",
-		overflow: "hidden",
-		scrollbarWidth: "none",
 	},
 	editButton: {
-		left: 10,
+		position: "absolute",
+		right: 10,
 		top: 10,
 	},
 	goBackButton: {
-		right: 10,
+		position: "absolute",
+		left: 10,
 		top: 10,
 	},
 	carouselContainer: {
