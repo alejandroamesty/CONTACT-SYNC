@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { StyleSheet, View, Text, ScrollView, Animated } from "react-native";
+import { StyleSheet, View, Text, ScrollView, Animated, BackHandler } from "react-native";
 
 import ContactDetail from "../contacts/ContactDetail";
 import ControlButton from "../../../components/buttons/ControlButton";
@@ -41,6 +41,14 @@ const GroupsScreen = ({ navigation }) => {
 	const [groupDescription, setGroupDescription] = useState("");
 	const [groupColor, setGroupColor] = useState(1);
 	const [updateGroups, setUpdateGroups] = useState(false);
+
+	useEffect(() => {
+		const handleBackButton = () => true;
+		BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+		return () => {
+			BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
+		};
+	}, []);
 
 	const fetchGroups = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {

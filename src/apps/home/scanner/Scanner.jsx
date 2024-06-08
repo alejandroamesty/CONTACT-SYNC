@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, TouchableOpacity, View, Dimensions, Image, FlatList } from "react-native";
+import { Button, StyleSheet, Text, TouchableOpacity, View, Dimensions, Image, FlatList, BackHandler } from "react-native";
 import ControlButton from "../../../components/buttons/ControlButton";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { API_URL, API_PORT } from "@env";
@@ -37,6 +37,14 @@ const Scanner = () => {
 	const [yourName, setYourName] = useState("");
 	const [firstLetter, setFirstLetter] = useState("?");
 	const [yourColor, setYourColor] = useState(1);
+
+	useEffect(() => {
+		const handleBackButton = () => true;
+		BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+		return () => {
+			BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
+		};
+	}, []);
 
 	const colors = ["#FFAC20", "#FF7246", "#FF4574", "#FF38EB", "#0684FE", "#33BE99"];
 
@@ -330,7 +338,7 @@ const Scanner = () => {
 						<View style={{ ...styles.icon, backgroundColor: colors[yourColor - 1] }}>
 							<Text style={{ color: "white", fontSize: 30 }}>{firstLetter}</Text>
 						</View>
-						<Text style={styles.nameText}>{yourName || `Contact`}</Text>
+						<Text style={styles.nameText}>{yourName ? "Contact" : yourName}</Text>
 						<View style={styles.qrCodePosition}>
 							<QRCode value={qrValue} size={200} color="black" backgroundColor="white" />
 						</View>
