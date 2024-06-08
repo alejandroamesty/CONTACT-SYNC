@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { StyleSheet, View, Text, FlatList } from "react-native";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { StyleSheet, View, Text, FlatList, Animated } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { API_URL, API_PORT } from "@env";
 
@@ -16,6 +16,8 @@ import GrayInput from "../../../components/inputs/GrayInput";
 import Carousel from "../../../components/Carousel";
 import CustomModal from "../../../components/modals/CustomModal";
 import DateInput from "../../../components/inputs/DateInput";
+import ConfirmationModal from "../../../components/modals/ConfirmationModal";
+import List from "../../../components/lists/List";
 
 const Stack = createStackNavigator();
 
@@ -37,6 +39,14 @@ const HomeScreen = ({ navigation }) => {
 	const [emails, setEmails] = useState([]);
 	const [urls, setURLs] = useState([]);
 	const [dates, setDates] = useState([]);
+	const [deleteModal, setDeleteModal] = useState(false);
+	const [groupModal, setGroupModal] = useState(false);
+	const [resetItem, setResetItem] = useState(null);
+	const fadeAnim = useRef(new Animated.Value(1)).current;
+	const [contactsAndGroups, setContactsAndGroups] = useState([]);
+	const [selectedContactId, setSelectedContactId] = useState([]);
+	const [selectedContactGroup, setSelectedContactGroup] = useState([]);
+	const [allGroups, setAllGroups] = useState([]);
 
 	const colorMapping = {
 		1: "#FFAC20",
@@ -138,6 +148,39 @@ const HomeScreen = ({ navigation }) => {
 
 	const closeModal = () => {
 		setModalVisible(false);
+	};
+
+	const openDeleteModal = (contactId) => {
+		setSelectedContactId(contactId);
+		setDeleteModal(true);
+	};
+
+	const closeDeleteModal = () => {
+		setDeleteModal(false);
+	};
+
+	const onCancel = () => {
+		setDeleteModal(false);
+		resetAllItems();
+	};
+
+	const resetAllItems = () => {
+		setResetItem(Date.now());
+	};
+
+	const openGroupModal = (contactId) => {
+		setSelectedContactGroup(contactId);
+		console.log("Selected contact group al abrir modal:", contactId); // Use contactId directly
+		setGroupModal(true);
+	};	
+
+	const closeGroupModal = () => {
+		setGroupModal(false);
+	};
+
+	const onCancelGroup = () => {
+		setGroupModal(false);
+		resetAllItems();
 	};
 
 	const addPhoneNumber = () => {
@@ -260,6 +303,117 @@ const HomeScreen = ({ navigation }) => {
 			});
 	};
 
+	const deleteContact = (contactId) => {
+		fetch(`${API_URL}:${API_PORT}/deleteContact`, {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				contactId: contactId,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					setContacts((prevContacts) => 
+						prevContacts.filter((contact) => contact.id !== contactId)
+					);
+					console.log(contactId)
+					closeDeleteModal();
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						console.log(text);
+					});
+				}
+			})
+			.catch((error) => {
+				console.log("Error:", error);
+			});
+	};
+	
+	const onAccept = (contactId) => {
+		deleteContact(contactId);
+	};
+	
+	useEffect(() => {
+		fetch(`${API_URL}:${API_PORT}/getAllContactsAndGroups`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+		.then((response) => {
+			if (response.status === 200) {
+				response.json()
+				.then((data) => {
+					console.log("Data:", data);
+					setContactsAndGroups(data);
+				})
+				.catch((error) => {
+					console.log("Error:", error);
+				});
+			} else if (response.status === 401) {
+				console.log("No session found");
+				navigation.navigate("SignIn");
+			} else {
+				console.log(response.status);
+				response.text().then((text) => {
+					console.log(text);
+				});
+			}
+		})
+		.catch((error) => {
+			console.log("Error:", error);
+		});
+	}, []);
+	
+	useEffect(() => {
+		if (selectedContactGroup && contactsAndGroups !== null) {
+            fetch(`${API_URL}:${API_PORT}/getGroups`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    response.json()
+                    .then((fetchedGroups) => {
+                        const filteredGroups = fetchedGroups.groups.filter((group) => {
+                            const groupContainsContact = contactsAndGroups.contacts.some((contactGroup) => {
+                                return contactGroup.group_id === group.id && contactGroup.contacts.includes(selectedContactGroup);
+                            });
+                            return !groupContainsContact;
+                        });
+                        const formattedGroups = filteredGroups.map((group) => ({
+                            id: group.id,
+                            name: group.group_name,
+                            checked: false,
+                        }));
+						console.log("Selected contact en el useEffect:", selectedContactGroup)
+						console.log('Filtered groups:', allGroups);
+                        setAllGroups(formattedGroups);
+                    })
+                    .catch((error) => {
+                        console.log("Error:", error);
+                    });
+                } else if (response.status === 401) {
+                    console.log("No session found");
+                    navigation.navigate("SignIn");
+                } else {
+                    console.log(response.status);
+                    response.text().then((text) => {
+                        console.log(text);
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log("Error:", error);
+            });
+        }
+    }, [selectedContactGroup, contactsAndGroups]);
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>Hello</Text>
@@ -284,7 +438,7 @@ const HomeScreen = ({ navigation }) => {
 			/>
 
 			<View style={styles.contactsContainer}>
-				<ContactList contacts={filteredContacts} addToGroup={() => {}} deleteContact={() => {}} navigation={navigation} />
+				<ContactList contacts={filteredContacts} addToGroup={openGroupModal} deleteContact={openDeleteModal} navigation={navigation} reset={resetItem}/>
 			</View>
 
 			<CustomModal
@@ -360,6 +514,37 @@ const HomeScreen = ({ navigation }) => {
 						/>
 					</View>
 				}
+			/>
+			<CustomModal
+				visible={groupModal}
+				closeModal={closeGroupModal}
+				title={"Add to group"}
+				cancelButtonName={"Cancel"}
+				doneButtonName={"Add"}
+				cancelButtonAction={onCancelGroup}
+				doneButtonAction={onCancelGroup}
+				cancelButtonColor="#F50000"
+				doneButtonColor="#33BE99"
+				modalContent={
+					<Animated.View style={{ opacity: fadeAnim }}>
+						<View style={styles.modalContainer}>
+							<GrayInput placeholder="Search name of group" image={require("../../../../assets/images/Search.png")} />
+							<View style={styles.list}>
+								<List data={allGroups} setExternalList={setAllGroups} />
+							</View>
+						</View>
+					</Animated.View>
+				}
+			/>
+			<ConfirmationModal
+				visible={deleteModal}
+				image={require("../../../../assets/images/DeleteModal.png")}
+				title="Delete contact"
+				text="Are you sure you want to permanently delete the selected contact?"
+				cancelButtonText="CANCEL"
+				acceptButtonText="ACCEPT"
+				onCancel={onCancel}
+				onAccept={() => onAccept(selectedContactId)}
 			/>
 		</View>
 	);
@@ -437,9 +622,13 @@ const styles = StyleSheet.create({
 	modalContentContainer: {
 		alignItems: "center",
 	},
+	modalContainer: {
+		alignItems: "center",
+	},
 	list: {
-		marginTop: 20,
-		height: 366,
+		width: 415,
+		height: 500,
+		marginTop: 15,
 	},
 	inputContact: {
 		marginTop: 20,
