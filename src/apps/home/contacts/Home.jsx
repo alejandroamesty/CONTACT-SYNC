@@ -22,6 +22,10 @@ import List from "../../../components/lists/List";
 const Stack = createStackNavigator();
 
 const HomeScreen = ({ navigation }) => {
+	const [yourName, setYourName] = useState("");
+	const [yourLastName, setYourLastName] = useState("");
+	const [yourAlias, setYourAlias] = useState("");
+	const [yourColor, setYourColor] = useState(1);
 	const [contacts, setContacts] = useState([]);
 	const [searchText, setSearchText] = useState("");
 	const [modalVisible, setModalVisible] = useState(false);
@@ -44,8 +48,17 @@ const HomeScreen = ({ navigation }) => {
 	const [selectedContactGroup, setSelectedContactGroup] = useState([]);
 	const [allGroups, setAllGroups] = useState([]);
 
+	const colorMapping = {
+		1: "#FFAC20",
+		2: "#FF7246",
+		3: "#FF4574",
+		4: "#FF38EB",
+		5: "#0684FE",
+		6: "#33BE99",
+	};
+
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getContacts`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -64,6 +77,7 @@ const HomeScreen = ({ navigation }) => {
 								}
 							});
 							setContacts(newContacts);
+							console.log("Contacts:", newContacts);
 						})
 						.catch((error) => {
 							console.log("Error:", error);
@@ -81,6 +95,31 @@ const HomeScreen = ({ navigation }) => {
 			.catch((error) => {
 				console.log("Error:", error);
 			});
+	}, []);
+
+	useEffect(() => {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=1`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}).then((response) => {
+			if (response.status === 200) {
+				response.text().then((text) => {
+					text = JSON.parse(text);
+					const contact = text.contact;
+					setYourAlias(contact.contact_alias);
+					setYourName(contact.first_name);
+					setYourLastName(contact.last_name);
+					setYourColor(contact.color);
+				});
+			} else {
+				console.log(response.status);
+				response.text().then((text) => {
+					console.log(text);
+				});
+			}
+		});
 	}, []);
 
 	useEffect(() => {
@@ -201,17 +240,6 @@ const HomeScreen = ({ navigation }) => {
 	};
 
 	const addContact = () => {
-		//working :D
-		console.log("Adding contact");
-		console.log("Color:", color);
-		console.log("First name:", firstName);
-		console.log("Last name:", lastName);
-		console.log("Alias:", alias);
-		console.log("Company:", company);
-		console.log("Address:", address);
-		console.log("Phone numbers:", phoneNumbers);
-		console.log("Emails:", emails);
-		console.log("URLs:", urls);
 		let newDates = [];
 		dates.forEach((date, index) => {
 			newDates.push({ ...date, date: `${date.date.getDate()}-${date.date.getMonth() + 1}-${date.date.getFullYear()}` });
@@ -223,7 +251,7 @@ const HomeScreen = ({ navigation }) => {
 			return;
 		}
 
-		fetch(`${API_URL}:${API_PORT}/createContact`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -389,8 +417,10 @@ const HomeScreen = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>Hello</Text>
-			<Text style={styles.subtitle}>Alejandro Ávila</Text>
-
+			<Text style={styles.subtitle}>{yourAlias ? yourAlias : yourName}</Text>
+			<View style={{ ...styles.userIcon, backgroundColor: colorMapping[yourColor] }}>
+				<Text style={styles.firstNameInitial}>{yourAlias ? yourAlias[0].toUpperCase() : yourName ? yourName[0].toUpperCase() : "?"}</Text>
+			</View>
 			<Text style={styles.undertitle}>Contacts</Text>
 
 			<ControlButton source={require("../../../../assets/images/Add.png")} size={36} style={styles.add} onPress={openModal} />

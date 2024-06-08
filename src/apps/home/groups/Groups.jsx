@@ -43,7 +43,7 @@ const GroupsScreen = ({ navigation }) => {
 	const [updateGroups, setUpdateGroups] = useState(false);
 
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getGroups`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -81,7 +81,7 @@ const GroupsScreen = ({ navigation }) => {
 	}, []);
 
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getContacts`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -173,7 +173,7 @@ const GroupsScreen = ({ navigation }) => {
 	};
 
 	const createGroup = () => {
-		fetch(`${API_URL}:${API_PORT}/createGroup`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createGroup`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -195,7 +195,7 @@ const GroupsScreen = ({ navigation }) => {
 								newContactCount++;
 							}
 						});
-						fetch(`${API_URL}:${API_PORT}/InsertMultipleContactToGroup`, {
+						fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/InsertMultipleContactToGroup`, {
 							method: "POST",
 							headers: {
 								"Content-Type": "application/json",

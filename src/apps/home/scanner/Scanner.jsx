@@ -63,45 +63,113 @@ const Scanner = () => {
 }`);
 
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getContactById?id=1`)
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=1`)
 			.then((response) => response.json())
 			.then((data) => {
 				setQRValue(
-					`{"first_name": "${data.contact.first_name}","last_name": "${data.contact.last_name}","alias": "${
-						data.contact.contact_alias
-					}","company": "${data.contact.company}","address": "${data.contact.address}","color": ${data.contact.color},"phones": ${
-						data.contact.phones.length > 0 ? `${data.contact.phones}` : `[]`
-					},"emails": ${data.contact.emails.length > 0 ? `${data.contact.emails}` : `[]`},"urls": ${
-						data.contact.urls.length > 0 ? `${data.contact.urls}` : `[]`
-					},"dates": ${data.contact.dates.length > 0 ? `${data.contact.dates}` : `[]`}}`
+					`{
+						"first_name": "${data.contact.first_name}",
+						"last_name": "${data.contact.last_name}",
+						"alias": "${data.contact.contact_alias}",
+						"company": "${data.contact.company}",
+						"address": "${data.contact.address}",
+						"color": ${data.contact.color},
+						"phones": ${JSON.stringify(data.contact.phones)},
+						"emails": ${JSON.stringify(data.contact.emails)},
+						"urls": ${JSON.stringify(data.contact.urls)},
+						"dates": ${JSON.stringify(data.contact.dates)}
+					}`
 				);
-				setYourName(data.contact.contact_alias ? `${data.contact.first_name} ${data.contact.last_name}` : data.contact.contact_alias);
+				setYourName(data.contact.contact_alias ? data.contact.contact_alias : `${data.contact.first_name} ${data.contact.last_name}`);
 				setFirstLetter(
 					data.contact.contact_alias
-						? data.contact.first_name
-							? data.contact.first_name[0]
+						? data.contact.contact_alias
+							? data.contact.contact_alias[0]
 							: "?"
-						: data.contact.contact_alias
-						? data.contact.contact_alias[0]
+						: data.contact.first_name
+						? data.contact.first_name[0]
 						: "?"
 				);
 				setYourColor(data.contact.color ? data.contact.color : 1);
 			});
 	}, []);
 
+	const emailTypes = [
+		{ id: 1, label: "home", value: "home" },
+		{ id: 2, label: "work", value: "work" },
+		{ id: 3, label: "school", value: "school" },
+		{ id: 4, label: "office", value: "office" },
+		{ id: 5, label: "other", value: "other" },
+	];
+
+	const phoneTypes = [
+		{ id: 1, label: "home", value: "home" },
+		{ id: 2, label: "mobile", value: "mobile" },
+		{ id: 3, label: "work", value: "work" },
+	];
+
+	const urlTypes = [
+		{ id: 1, label: "website", value: "website" },
+		{ id: 2, label: "Instagram", value: "Instagram" },
+		{ id: 3, label: "Twitter", value: "Twitter" },
+		{ id: 4, label: "office", value: "office" },
+		{ id: 5, label: "other", value: "other" },
+	];
+
+	const dateTypes = [
+		{ id: 1, label: "birthday", value: "birthday" },
+		{ id: 2, label: "anniversary", value: "anniversary" },
+		{ id: 3, label: "other", value: "other" },
+	];
+
 	function onBarcodeScanned(data) {
-		const parsedData = JSON.parse(data.data);
 		handleScanner();
+		const parsedData = JSON.parse(data.data);
 		setFirstName(parsedData.first_name);
 		setLastName(parsedData.last_name);
 		setColor(parsedData.color);
 		setAlias(parsedData.alias);
 		setCompany(parsedData.company);
 		setAddress(parsedData.address);
-		setPhoneNumbers(parsedData.phones);
-		setEmails(parsedData.emails);
-		setURLs(parsedData.urls);
-		setDates(parsedData.dates);
+		const newPhones = [];
+		parsedData.phones.forEach((phone) => {
+			newPhones.push({
+				id: phone.id,
+				type: phoneTypes.find((type) => type.id === phone.phone_type).value,
+				phoneNumber: phone.phone_number,
+				phoneCode: phone.phone_code.toString(),
+			});
+		});
+		setPhoneNumbers(newPhones);
+		const newEmails = [];
+		parsedData.emails.forEach((email) => {
+			newEmails.push({
+				id: email.id,
+				typeLabel: emailTypes.find((type) => type.id === email.email_type).value,
+				email: email.email_direction,
+			});
+		});
+		setEmails(newEmails);
+		const newUrls = [];
+		parsedData.urls.forEach((url) => {
+			newUrls.push({
+				id: url.id,
+				typeLabel: urlTypes.find((type) => type.id === url.type).value,
+				url: url.url,
+			});
+		});
+		setURLs(newUrls);
+		const newDates = [];
+		parsedData.dates.forEach((date) => {
+			newDates.push({
+				id: date.id,
+				typeLabel: dateTypes.find((type) => type.id === date.date_type).value,
+				date: new Date(date.contact_date),
+			});
+			console.log(dateTypes.find((type) => type.id === date.date_type).value);
+		});
+		console.log(parsedData.dates);
+		setDates(newDates);
 		openModal();
 	}
 
@@ -110,14 +178,12 @@ const Scanner = () => {
 		dates.forEach((date, index) => {
 			newDates.push({ ...date, date: `${date.date.getDate()}-${date.date.getMonth() + 1}-${date.date.getFullYear()}` });
 		});
-		console.log("Dates:", newDates);
-
 		if (!firstName || !phoneNumbers[0] || phoneNumbers[0].phoneNumber === "" || phoneNumbers[0].phoneCode === "") {
 			console.log("First name and phone number are required");
 			return;
 		}
 
-		fetch(`${API_URL}:${API_PORT}/createContact`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -305,10 +371,10 @@ const Scanner = () => {
 							ListFooterComponent={
 								<>
 									<Text style={styles.sectionTitle}>Phone Numbers</Text>
-									{phoneNumbers.map((phone, index) => (
+									{phoneNumbers.map((phone_number, index) => (
 										<PhoneInput
 											key={index}
-											phone={phone}
+											phone={phone_number}
 											setPhone={(newPhone) => setPhone(index, newPhone)}
 											removePhone={() => removePhone(index)}
 										/>

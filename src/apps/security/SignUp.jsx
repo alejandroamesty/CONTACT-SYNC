@@ -19,7 +19,7 @@ const SignUp = ({ navigation }) => {
 			console.log("Passwords do not match");
 			return;
 		}
-		fetch(`${API_URL}:${API_PORT}/register`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/register`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
