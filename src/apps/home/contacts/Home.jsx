@@ -449,11 +449,11 @@ const HomeScreen = ({ navigation }) => {
 							style={styles.list}
 							ListHeaderComponent={
 								<>
-									<GrayInput placeholder="First name" style={styles.input} value={firstName} onChangeText={setFirstName} />
-									<GrayInput placeholder="Last name" style={styles.input} onChangeText={setLastName} />
-									<GrayInput placeholder="Alias" style={styles.input} onChangeText={setAlias} />
-									<GrayInput placeholder="Company" style={styles.input} onChangeText={setCompany} />
-									<GrayInput placeholder="Address" style={[styles.input, styles.lastInput]} onChangeText={setAddress} />
+									<GrayInput placeholder="First name" style={styles.input} value={firstName} onChangeText={setFirstName} characterLimit={40} />
+									<GrayInput placeholder="Last name" style={styles.input} onChangeText={setLastName} characterLimit={40} />
+									<GrayInput placeholder="Alias" style={styles.input} onChangeText={setAlias} characterLimit={15} />
+									<GrayInput placeholder="Company" style={styles.input} onChangeText={setCompany} characterLimit={20} />
+									<GrayInput placeholder="Address" style={[styles.input, styles.lastInput]} onChangeText={setAddress} characterLimit={100} />
 								</>
 							}
 							ListFooterComponent={
