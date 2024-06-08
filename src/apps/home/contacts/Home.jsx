@@ -405,6 +405,13 @@ const HomeScreen = ({ navigation }) => {
 		}
 	};
 
+	const addToGroup = async () => {
+		console.log("Adding to group");
+		console.log("Selected contact ID:", selectedContactId);
+		const selectedGroups = allGroups.filter((group) => group.checked);
+		console.log("Selected groups:", selectedGroups);
+	};
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>Hello</Text>
@@ -519,7 +526,7 @@ const HomeScreen = ({ navigation }) => {
 				cancelButtonName={"Cancel"}
 				doneButtonName={"Add"}
 				cancelButtonAction={onCancelGroup}
-				doneButtonAction={onCancelGroup}
+				doneButtonAction={addToGroup}
 				cancelButtonColor="#F50000"
 				doneButtonColor="#33BE99"
 				modalContent={
