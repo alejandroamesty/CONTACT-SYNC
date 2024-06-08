@@ -57,6 +57,7 @@ const ContactList = ({ contacts, addToGroup, deleteContact, navigation, reset })
             )}
             keyExtractor={(item, index) => item.title + index}
             contentContainerStyle={styles.contactList}
+            showsVerticalScrollIndicator={false}
         />
     );
 };
