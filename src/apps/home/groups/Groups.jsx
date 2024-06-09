@@ -11,7 +11,6 @@ import CustomModal from "../../../components/modals/CustomModal";
 import Carousel from "../../../components/Carousel";
 import GrayInput from "../../../components/inputs/GrayInput";
 import List from "../../../components/lists/List";
-import MessageBar from "../../../components/MessageBar";
 import { API_URL, API_PORT } from "@env";
 
 import GroupDetail from "./GroupDetail";
@@ -44,9 +43,6 @@ const GroupsScreen = ({ navigation }) => {
 	const [groupColor, setGroupColor] = useState(1);
 	const [updateGroups, setUpdateGroups] = useState(false);
 	const [searchText, setSearchText] = useState("");
-	const [severity, setSeverity] = useState("error");
-	const [restart, setRestart] = useState(false);
-	const [message, setMessage] = useState("");
 
 	useEffect(() => {
 		const handleBackButton = () => true;
@@ -56,26 +52,58 @@ const GroupsScreen = ({ navigation }) => {
 		};
 	}, []);
 
+	const handleChangeText = (text) => {
+		setSearchText(text);
+	};
+
 	useEffect(() => {
 		sortGroups();
 	}, [searchText]);
+
+	const fetchGroups = () => {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response
+						.text()
+						.then((fetchedGroups) => {
+							fetchedGroups = JSON.parse(fetchedGroups);
+							const newGroups = [];
+							fetchedGroups.groups.forEach((group) => {
+								newGroups.push(group);
+							});
+							setGroups(newGroups);
+							setBaseGroups(newGroups);
+							setUpdateGroups(true);
+						})
+						.catch((error) => {
+							console.log("Error:", error);
+						});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						console.log(text);
+					});
+				}
+			})
+			.catch((error) => {
+				console.log("Error:", error);
+			});
+	};
 
 	useEffect(() => {
 		fetchGroups();
 	}, []);
 
 	useEffect(() => {
-		fetchContacts();
-	}, []);
-
-	useEffect(() => {
-		if (updateGroups) {
-			sortGroups();
-			setUpdateGroups(false);
-		}
-	}, [baseGroups]);
-
-	const fetchContacts = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
 			method: "GET",
 			headers: {
@@ -102,9 +130,7 @@ const GroupsScreen = ({ navigation }) => {
 							setContacts(newContacts);
 						})
 						.catch((error) => {
-							setSeverity("error");
-							setMessage("Error on fetching contacts");
-							setRestart(true);
+							console.log("Error:", error);
 						});
 				} else if (response.status === 401) {
 					console.log("No session found");
@@ -112,57 +138,64 @@ const GroupsScreen = ({ navigation }) => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						setSeverity("error");
-						setMessage(text.message);
-						setRestart(true);
+						console.log(text);
 					});
 				}
 			})
 			.catch((error) => {
 				console.log("Error:", error);
 			});
+	}, []);
+
+	useEffect(() => {
+		if (updateGroups) {
+			sortGroups();
+			setUpdateGroups(false);
+		}
+	}, [groups]);
+
+	const openModal = () => {
+		setModalVisible(true);
+		setCurrentStep(1);
+		fadeAnim.setValue(1);
 	};
 
-	const fetchGroups = () => {
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					response
-						.text()
-						.then((fetchedGroups) => {
-							fetchedGroups = JSON.parse(fetchedGroups);
-							const newGroups = [];
-							fetchedGroups.groups.forEach((group) => {
-								newGroups.push(group);
-							});
-							setUpdateGroups(true);
-							setBaseGroups(newGroups);
-						})
-						.catch((error) => {
-							setSeverity("error");
-							setMessage("Error on fetching groups");
-							setRestart(true);
-						});
-				} else if (response.status === 401) {
-					console.log("No session found");
-					navigation.navigate("SignIn");
-				} else {
-					console.log(response.status);
-					response.text().then((text) => {
-						setSeverity("error");
-						setMessage(text.message);
-						setRestart(true);
-					});
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
+	const closeModal = () => {
+		setModalVisible(false);
+		setCurrentStep(1);
+	};
+
+	const goToNextStep = () => {
+		Animated.timing(fadeAnim, {
+			toValue: 0,
+			duration: 300,
+			useNativeDriver: true,
+		}).start(() => {
+			setCurrentStep(2);
+			Animated.timing(fadeAnim, {
+				toValue: 1,
+				duration: 300,
+				useNativeDriver: true,
+			}).start();
+		});
+	};
+
+	const sortGroups = () => {
+		// First compare group_name with search text
+		// Sort the groups in groups state alphabetically by name except for the first two groups
+
+		const filteredGroups = baseGroups.filter((group) => group.group_name.toLowerCase().includes(searchText.toLowerCase()));
+		const sortedGroups = [...filteredGroups];
+		sortedGroups.sort((a, b) => {
+			if (a.id === 2 || a.id === 1) {
+				return -1;
+			} else if (b.id === 2 || b.id === 1) {
+				return 1;
+			} else {
+				return a.group_name.localeCompare(b.group_name);
+			}
+		});
+		setGroups(sortedGroups);
 	};
 
 	const createGroup = () => {
@@ -202,6 +235,7 @@ const GroupsScreen = ({ navigation }) => {
 								if (response.status === 200) {
 									console.log("Group created successfully");
 									closeModal();
+
 									fetchGroups();
 								} else if (response.status === 401) {
 									console.log("No session found");
@@ -209,16 +243,12 @@ const GroupsScreen = ({ navigation }) => {
 								} else {
 									console.log(response.status);
 									response.text().then((text) => {
-										setSeverity("error");
-										setMessage(text.message);
-										setRestart(true);
+										console.log(text);
 									});
 								}
 							})
 							.catch((error) => {
-								setSeverity("error");
-								setMessage("Error on adding contacts");
-								setRestart(true);
+								console.log("Error:", error);
 							});
 					});
 				} else if (response.status === 401) {
@@ -227,63 +257,13 @@ const GroupsScreen = ({ navigation }) => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						setSeverity("error");
-						setMessage(text.message);
-						setRestart(true);
+						console.log(text);
 					});
 				}
 			})
 			.catch((error) => {
 				console.log("Error:", error);
 			});
-	};
-
-	const sortGroups = () => {
-		// First compare group_name with search text
-		// Sort the groups in groups state alphabetically by name except for the first two groups
-
-		const filteredGroups = baseGroups.filter((group) => group.group_name.toLowerCase().includes(searchText.toLowerCase()));
-		const sortedGroups = [...filteredGroups];
-		sortedGroups.sort((a, b) => {
-			if (a.id === 2 || a.id === 1) {
-				return -1;
-			} else if (b.id === 2 || b.id === 1) {
-				return 1;
-			} else {
-				return a.group_name.localeCompare(b.group_name);
-			}
-		});
-		setGroups(sortedGroups);
-	};
-
-	const handleChangeText = (text) => {
-		setSearchText(text);
-	};
-
-	const openModal = () => {
-		setModalVisible(true);
-		setCurrentStep(1);
-		fadeAnim.setValue(1);
-	};
-
-	const closeModal = () => {
-		setModalVisible(false);
-		setCurrentStep(1);
-	};
-
-	const goToNextStep = () => {
-		Animated.timing(fadeAnim, {
-			toValue: 0,
-			duration: 300,
-			useNativeDriver: true,
-		}).start(() => {
-			setCurrentStep(2);
-			Animated.timing(fadeAnim, {
-				toValue: 1,
-				duration: 300,
-				useNativeDriver: true,
-			}).start();
-		});
 	};
 
 	const goToPreviousStep = () => {
@@ -350,9 +330,6 @@ const GroupsScreen = ({ navigation }) => {
 				doneButtonColor="#33BE99"
 				modalContent={
 					<Animated.View style={{ opacity: fadeAnim }}>
-						<View style={styles.messageBarContainer}>
-							<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
-						</View>
 						{currentStep === 1 ? (
 							<View style={styles.modalContainer}>
 								<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
@@ -469,9 +446,5 @@ const styles = StyleSheet.create({
 		width: 415,
 		height: 500,
 		marginTop: 15,
-	},
-	messageBarContainer: {
-		position: "absolute",
-		top: -195,
 	},
 });

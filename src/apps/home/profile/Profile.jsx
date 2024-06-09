@@ -93,9 +93,21 @@ const Profile = ({ navigation }) => {
 		};
 	}, []);
 
-	useEffect(() => {
-		getContact();
-	}, []);
+	const goToEditAccount = () => {
+		navigation.navigate("EditAccount");
+	};
+
+	const handleLogOut = () => {
+		setModalVisible(true);
+	};
+
+	const onCancel = () => {
+		setModalVisible(false);
+	};
+
+	const onNevermind = () => {
+		setDeleteModalVisible(false);
+	};
 
 	const getContact = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=1`, {
@@ -110,6 +122,7 @@ const Profile = ({ navigation }) => {
 						text = JSON.parse(text);
 						const contact = text.contact;
 						setContact(contact);
+						console.log(contact);
 						setFirstName(contact.first_name);
 						setLastName(contact.last_name);
 						setAlias(contact.contact_alias);
@@ -146,18 +159,18 @@ const Profile = ({ navigation }) => {
 					console.log("Error");
 					console.log(response.status);
 					response.text().then((text) => {
-						setSeverity("error");
-						setMessage(text.message);
-						setShowMessage(true);
+						console.log(text);
 					});
 				}
 			})
 			.catch((error) => {
-				setSeverity("error");
-				setMessage("An error occured");
-				setShowMessage(true);
+				console.log("Error:", error);
 			});
 	};
+
+	useEffect(() => {
+		getContact();
+	}, []);
 
 	const onAccept = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/logout`, {
@@ -173,15 +186,17 @@ const Profile = ({ navigation }) => {
 					console.log("Error");
 					console.log(response.status);
 					response.text().then((text) => {
-						setSeverity("error");
-						setMessage(text.message);
-						setShowMessage(true);
+						console.log(text);
 					});
 				}
 			})
 			.catch((error) => {
 				console.log("Error:", error);
 			});
+	};
+
+	const handleDeleteAccount = () => {
+		setDeleteModalVisible(true);
 	};
 
 	const onDelete = () => {
@@ -205,16 +220,12 @@ const Profile = ({ navigation }) => {
 					setShowMessage(true);
 					setRestart(true);
 					response.text().then((text) => {
-						setSeverity("error");
-						setMessage(text.message);
-						setShowMessage(true);
+						console.log(text);
 					});
 				}
 			})
 			.catch((error) => {
-				setSeverity("error");
-				setMessage("An error occured");
-				setShowMessage(true);
+				console.log("Error:", error);
 			});
 	};
 
@@ -244,34 +255,14 @@ const Profile = ({ navigation }) => {
 					closeModal();
 				});
 			} else {
+				console.log("Error:", response.status);
 				response.text().then((text) => {
 					text = JSON.parse(text);
-					setSeverity("error");
-					setMessage(text.message);
-					setShowMessage(true);
+					setErrorMessage(text.message);
+					console.log(text);
 				});
 			}
 		});
-	};
-
-	const goToEditAccount = () => {
-		navigation.navigate("EditAccount");
-	};
-
-	const handleLogOut = () => {
-		setModalVisible(true);
-	};
-
-	const onCancel = () => {
-		setModalVisible(false);
-	};
-
-	const onNevermind = () => {
-		setDeleteModalVisible(false);
-	};
-
-	const handleDeleteAccount = () => {
-		setDeleteModalVisible(true);
 	};
 
 	const openModal = () => {
@@ -346,6 +337,7 @@ const Profile = ({ navigation }) => {
 					<>
 						<View style={styles.container}>
 							<Text style={styles.title}>Profile</Text>
+
 							<View style={styles.buttons}>
 								<TouchableOpacity onPress={() => navigation.navigate("MyContactDetail", { contact: yourContact })}>
 									<View style={styles.card}>
@@ -404,32 +396,16 @@ const Profile = ({ navigation }) => {
 									cancelButtonColor="#7D7D7D"
 									doneButtonColor="#F74040"
 									modalContent={
-										<>
-											<View style={styles.deleteMessageBarContainer}>
-												<MessageBar
-													severity={severity}
-													caption={message}
-													showTime={3000}
-													restart={restart}
-													setRestart={setRestart}
-												/>
-											</View>
-											<View style={styles.inputDelete}>
-												<GrayInput placeholder="Email" style={styles.input} onChangeText={setDeleteEmail} />
-												<GrayInput placeholder="Password" style={styles.lastInput} onChangeText={setDeletePassword} />
-											</View>
-										</>
+										<View style={styles.inputDelete}>
+											<GrayInput placeholder="Email" style={styles.input} onChangeText={setDeleteEmail} />
+											<GrayInput placeholder="Password" style={styles.lastInput} onChangeText={setDeletePassword} />
+										</View>
 									}
 								/>
 
 								<TouchableOpacity onPress={handleLogOut}>
 									<View style={styles.button}>
-										<ControlButton
-											source={require("../../../../assets/images/Profile/Leave.png")}
-											size={30}
-											style={styles.add}
-											onPress={handleLogOut}
-										/>
+										<ControlButton source={require("../../../../assets/images/Profile/Leave.png")} size={30} style={styles.add} onPress={handleLogOut} />
 										<Text style={styles.text}>Log out</Text>
 									</View>
 								</TouchableOpacity>
@@ -446,118 +422,107 @@ const Profile = ({ navigation }) => {
 								cancelButtonColor="#F50"
 								doneButtonColor="#33BE99"
 								modalContent={
-									<>
-										<View style={styles.messageBarContainer}>
-											<MessageBar
-												severity={severity}
-												caption={message}
-												showTime={3000}
-												restart={restart}
-												setRestart={setRestart}
+									<View style={styles.modalContentContainer}>
+										<View style={styles.carouselContainer}>
+											<Carousel
+												letter={firstName ? firstName[0].toUpperCase() : "?"}
+												defaultColor={colorMapping[color]}
+												setIndex={setColor}
 											/>
 										</View>
-										<View style={styles.modalContentContainer}>
-											<View style={styles.carouselContainer}>
-												<Carousel
-													letter={firstName ? firstName[0].toUpperCase() : "?"}
-													defaultColor={colorMapping[color]}
-													setIndex={setColor}
-												/>
-											</View>
-											<FlatList
-												style={styles.list}
-												ListHeaderComponent={
-													<>
-														<GrayInput
-															placeholder="First name"
-															style={styles.input}
-															value={firstName}
-															onChangeText={setFirstName}
-															defaultValue={firstName}
-															characterLimit={40}
+										<FlatList
+											style={styles.list}
+											ListHeaderComponent={
+												<>
+													<GrayInput
+														placeholder="First name"
+														style={styles.input}
+														value={firstName}
+														onChangeText={setFirstName}
+														defaultValue={firstName}
+														characterLimit={40}
+													/>
+													<GrayInput
+														placeholder="Last name"
+														style={styles.input}
+														value={lastName}
+														onChangeText={setLastName}
+														defaultValue={lastName}
+														characterLimit={40}
+													/>
+													<GrayInput
+														placeholder="Alias"
+														style={styles.input}
+														value={alias}
+														onChangeText={setAlias}
+														defaultValue={alias}
+														characterLimit={15}
+													/>
+													<GrayInput
+														placeholder="Company"
+														style={styles.input}
+														value={company}
+														onChangeText={setCompany}
+														defaultValue={company}
+														characterLimit={20}
+													/>
+													<GrayInput
+														placeholder="Address"
+														style={{ marginBottom: 0 }}
+														value={address}
+														onChangeText={setAddress}
+														defaultValue={address}
+														characterLimit={100}
+													/>
+												</>
+											}
+											ListFooterComponent={
+												<>
+													<Text style={styles.sectionTitle}>Phone Numbers</Text>
+													{phoneNumbers.map((phone, index) => (
+														<PhoneInput
+															key={index}
+															phone={phone}
+															setPhone={(newPhone) => setPhone(index, newPhone)}
+															removePhone={() => removePhone(index)}
 														/>
-														<GrayInput
-															placeholder="Last name"
-															style={styles.input}
-															value={lastName}
-															onChangeText={setLastName}
-															defaultValue={lastName}
-															characterLimit={40}
+													))}
+													<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
+													<Text style={styles.errorMessage}>{errorMessage}</Text>
+													<Text style={styles.sectionTitle}>Emails</Text>
+													{emails.map((email, index) => (
+														<EmailInput
+															key={index}
+															data={email}
+															setData={(newEmail) => setEmail(index, newEmail)}
+															removeData={() => removeEmail(index)}
 														/>
-														<GrayInput
-															placeholder="Alias"
-															style={styles.input}
-															value={alias}
-															onChangeText={setAlias}
-															defaultValue={alias}
-															characterLimit={15}
+													))}
+													<AddButton onPress={addEmail} buttonText="add email" />
+													<Text style={styles.sectionTitle}>URLs</Text>
+													{urls.map((url, index) => (
+														<URLInput
+															key={index}
+															data={url}
+															setData={(newURL) => setURL(index, newURL)}
+															removeData={() => removeURL(index)}
 														/>
-														<GrayInput
-															placeholder="Company"
-															style={styles.input}
-															value={company}
-															onChangeText={setCompany}
-															defaultValue={company}
-															characterLimit={20}
+													))}
+													<AddButton onPress={addURL} buttonText="add URL" />
+													<Text style={styles.sectionTitle}>Dates</Text>
+													{dates.map((date, index) => (
+														<DateInput
+															key={index}
+															data={date}
+															setData={(newDate) => setDate(index, newDate)}
+															removeData={() => removeDate(index)}
 														/>
-														<GrayInput
-															placeholder="Address"
-															style={{ marginBottom: 0 }}
-															value={address}
-															onChangeText={setAddress}
-															defaultValue={address}
-															characterLimit={100}
-														/>
-													</>
-												}
-												ListFooterComponent={
-													<>
-														<Text style={styles.sectionTitle}>Phone Numbers</Text>
-														{phoneNumbers.map((phone, index) => (
-															<PhoneInput
-																key={index}
-																phone={phone}
-																setPhone={(newPhone) => setPhone(index, newPhone)}
-																removePhone={() => removePhone(index)}
-															/>
-														))}
-														<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
-														<Text style={styles.errorMessage}>{errorMessage}</Text>
-														<Text style={styles.sectionTitle}>Emails</Text>
-														{emails.map((email, index) => (
-															<EmailInput
-																key={index}
-																data={email}
-																setData={(newEmail) => setEmail(index, newEmail)}
-																removeData={() => removeEmail(index)}
-															/>
-														))}
-														<AddButton onPress={addEmail} buttonText="add email" />
-														<Text style={styles.sectionTitle}>URLs</Text>
-														{urls.map((url, index) => (
-															<URLInput
-																key={index}
-																data={url}
-																setData={(newURL) => setURL(index, newURL)}
-																removeData={() => removeURL(index)}
-															/>
-														))}
-														<AddButton onPress={addURL} buttonText="add URL" />
-														<Text style={styles.sectionTitle}>Dates</Text>
-														{dates.map((date, index) => (
-															<DateInput
-																key={index}
-																data={date}
-																setData={(newDate) => setDate(index, newDate)}
-																removeData={() => removeDate(index)}
-															/>
-														))}
-														<AddButton onPress={addDate} buttonText="add date" />
-													</>
-												}
-											/>
-										</View>
-									</>
+													))}
+													<AddButton onPress={addDate} buttonText="add date" />
+												</>
+											}
+										/>
+									</View>
 								}
 							/>
 							<ConfirmationModal
@@ -701,15 +666,5 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontFamily: "BROmnyRegular",
 		marginTop: 10,
-	},
-	messageBarContainer: {
-		position: "absolute",
-		alignSelf: "center",
-		top: -60,
-	},
-	deleteMessageBarContainer: {
-		position: "absolute",
-		alignSelf: "center",
-		top: -370,
 	},
 });
