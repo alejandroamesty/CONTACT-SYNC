@@ -72,6 +72,10 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 	};
 
 	useEffect(() => {
+		getContactById();
+	}, [id]);
+
+	const getContactById = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=${id}`, {
 			method: "GET",
 			headers: {
@@ -141,7 +145,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 			.catch((error) => {
 				console.log("Fetch error:", error);
 			});
-	}, [id]);
+	};
 
 	const openModal = () => {
 		setModalVisible(true);
@@ -253,9 +257,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 				<View style={[styles.userIcon, { backgroundColor: colorMapping[color] }]}>
 					<Text style={styles.firstNameInitial}>{firstName[0] || "?"}</Text>
 				</View>
-				<Text style={styles.name}>
-					{firstName && lastName ? `${firstName} ${lastName}` : "Create your contact card"}
-				</Text>
+				<Text style={styles.name}>{firstName && lastName ? `${firstName} ${lastName}` : "Create your contact card"}</Text>
 				<Text style={styles.alias}>{alias ? `"${alias}"` : "" || 'Go to "Profile" and click the edit button'}</Text>
 			</View>
 			<ScrollView style={styles.container} indicatorStyle="white">
@@ -322,7 +324,14 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 										defaultValue={lastName}
 										characterLimit={40}
 									/>
-									<GrayInput placeholder="Alias" style={styles.input} value={alias} onChangeText={setAlias} defaultValue={alias} characterLimit={15} />
+									<GrayInput
+										placeholder="Alias"
+										style={styles.input}
+										value={alias}
+										onChangeText={setAlias}
+										defaultValue={alias}
+										characterLimit={15}
+									/>
 									<GrayInput
 										placeholder="Company"
 										style={styles.input}
