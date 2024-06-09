@@ -11,6 +11,7 @@ import CustomModal from "../../../components/modals/CustomModal";
 import Carousel from "../../../components/Carousel";
 import GrayInput from "../../../components/inputs/GrayInput";
 import List from "../../../components/lists/List";
+import MessageBar from "../../../components/MessageBar";
 import { API_URL, API_PORT } from "@env";
 
 import GroupDetail from "./GroupDetail";
@@ -43,6 +44,9 @@ const GroupsScreen = ({ navigation }) => {
 	const [groupColor, setGroupColor] = useState(1);
 	const [updateGroups, setUpdateGroups] = useState(false);
 	const [searchText, setSearchText] = useState("");
+	const [severity, setSeverity] = useState("error");
+	const [restart, setRestart] = useState(false);
+	const [message, setMessage] = useState("");
 
 	useEffect(() => {
 		const handleBackButton = () => true;
@@ -52,58 +56,26 @@ const GroupsScreen = ({ navigation }) => {
 		};
 	}, []);
 
-	const handleChangeText = (text) => {
-		setSearchText(text);
-	};
-
 	useEffect(() => {
 		sortGroups();
 	}, [searchText]);
-
-	const fetchGroups = () => {
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					response
-						.text()
-						.then((fetchedGroups) => {
-							fetchedGroups = JSON.parse(fetchedGroups);
-							const newGroups = [];
-							fetchedGroups.groups.forEach((group) => {
-								newGroups.push(group);
-							});
-							setGroups(newGroups);
-							setBaseGroups(newGroups);
-							setUpdateGroups(true);
-						})
-						.catch((error) => {
-							console.log("Error:", error);
-						});
-				} else if (response.status === 401) {
-					console.log("No session found");
-					navigation.navigate("SignIn");
-				} else {
-					console.log(response.status);
-					response.text().then((text) => {
-						console.log(text);
-					});
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
-	};
 
 	useEffect(() => {
 		fetchGroups();
 	}, []);
 
 	useEffect(() => {
+		fetchContacts();
+	}, []);
+
+	useEffect(() => {
+		if (updateGroups) {
+			sortGroups();
+			setUpdateGroups(false);
+		}
+	}, [baseGroups]);
+
+	const fetchContacts = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
 			method: "GET",
 			headers: {
@@ -130,7 +102,9 @@ const GroupsScreen = ({ navigation }) => {
 							setContacts(newContacts);
 						})
 						.catch((error) => {
-							console.log("Error:", error);
+							setSeverity("error");
+							setMessage("Error on fetching contacts");
+							setRestart(true);
 						});
 				} else if (response.status === 401) {
 					console.log("No session found");
@@ -138,46 +112,57 @@ const GroupsScreen = ({ navigation }) => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						console.log(text);
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
 					});
 				}
 			})
 			.catch((error) => {
 				console.log("Error:", error);
 			});
-	}, []);
-
-	useEffect(() => {
-		if (updateGroups) {
-			sortGroups();
-			setUpdateGroups(false);
-		}
-	}, [groups]);
-
-	const openModal = () => {
-		setModalVisible(true);
-		setCurrentStep(1);
-		fadeAnim.setValue(1);
 	};
 
-	const closeModal = () => {
-		setModalVisible(false);
-		setCurrentStep(1);
-	};
-
-	const goToNextStep = () => {
-		Animated.timing(fadeAnim, {
-			toValue: 0,
-			duration: 300,
-			useNativeDriver: true,
-		}).start(() => {
-			setCurrentStep(2);
-			Animated.timing(fadeAnim, {
-				toValue: 1,
-				duration: 300,
-				useNativeDriver: true,
-			}).start();
-		});
+	const fetchGroups = () => {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response
+						.text()
+						.then((fetchedGroups) => {
+							fetchedGroups = JSON.parse(fetchedGroups);
+							const newGroups = [];
+							fetchedGroups.groups.forEach((group) => {
+								newGroups.push(group);
+							});
+							setUpdateGroups(true);
+							setBaseGroups(newGroups);
+						})
+						.catch((error) => {
+							setSeverity("error");
+							setMessage("Error on fetching groups");
+							setRestart(true);
+						});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				console.log("Error:", error);
+			});
 	};
 
 	const sortGroups = () => {
@@ -235,7 +220,6 @@ const GroupsScreen = ({ navigation }) => {
 								if (response.status === 200) {
 									console.log("Group created successfully");
 									closeModal();
-
 									fetchGroups();
 								} else if (response.status === 401) {
 									console.log("No session found");
@@ -266,6 +250,36 @@ const GroupsScreen = ({ navigation }) => {
 			});
 	};
 
+	const handleChangeText = (text) => {
+		setSearchText(text);
+	};
+
+	const openModal = () => {
+		setModalVisible(true);
+		setCurrentStep(1);
+		fadeAnim.setValue(1);
+	};
+
+	const closeModal = () => {
+		setModalVisible(false);
+		setCurrentStep(1);
+	};
+
+	const goToNextStep = () => {
+		Animated.timing(fadeAnim, {
+			toValue: 0,
+			duration: 300,
+			useNativeDriver: true,
+		}).start(() => {
+			setCurrentStep(2);
+			Animated.timing(fadeAnim, {
+				toValue: 1,
+				duration: 300,
+				useNativeDriver: true,
+			}).start();
+		});
+	};
+
 	const goToPreviousStep = () => {
 		Animated.timing(fadeAnim, {
 			toValue: 0,
@@ -283,6 +297,7 @@ const GroupsScreen = ({ navigation }) => {
 
 	return (
 		<View style={styles.container}>
+			<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 			<Text style={styles.title}>Groups</Text>
 
 			<ControlButton source={require("../../../../assets/images/Add.png")} size={36} style={styles.add} onPress={openModal} />

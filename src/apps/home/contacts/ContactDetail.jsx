@@ -71,7 +71,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 		3: "other",
 	};
 
-	useEffect(() => {
+	const fetchContact = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=${id}`, {
 			method: "GET",
 			headers: {
@@ -141,6 +141,10 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 			.catch((error) => {
 				console.log("Fetch error:", error);
 			});
+	};
+
+	useEffect(() => {
+		fetchContact();
 	}, [id]);
 
 	const openModal = () => {
@@ -172,9 +176,8 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 			}),
 		}).then((response) => {
 			if (response.status === 200) {
-				response.text().then((text) => {
-					closeModal();
-				});
+				closeModal();
+				fetchContact();
 			} else {
 				console.log("Error:", response.status);
 				response.text().then((text) => {
@@ -322,7 +325,14 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 										defaultValue={lastName}
 										characterLimit={40}
 									/>
-									<GrayInput placeholder="Alias" style={styles.input} value={alias} onChangeText={setAlias} defaultValue={alias} characterLimit={15} />
+									<GrayInput
+										placeholder="Alias"
+										style={styles.input}
+										value={alias}
+										onChangeText={setAlias}
+										defaultValue={alias}
+										characterLimit={15}
+									/>
 									<GrayInput
 										placeholder="Company"
 										style={styles.input}
