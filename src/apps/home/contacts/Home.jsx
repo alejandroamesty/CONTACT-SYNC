@@ -321,7 +321,7 @@ const HomeScreen = ({ navigation }) => {
 	};
 
 	const deleteContact = (contactId) => {
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/ydeleteContact`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/deleteContact`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
