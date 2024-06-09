@@ -71,6 +71,10 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 		3: "other",
 	};
 
+	useEffect(() => {
+		fetchContact();
+	}, [id]);
+
 	const fetchContact = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=${id}`, {
 			method: "GET",
@@ -143,18 +147,6 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 			});
 	};
 
-	useEffect(() => {
-		fetchContact();
-	}, [id]);
-
-	const openModal = () => {
-		setModalVisible(true);
-	};
-
-	const closeModal = () => {
-		setModalVisible(false);
-	};
-
 	const updateContact = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/updateContact`, {
 			method: "PUT",
@@ -185,6 +177,14 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 				});
 			}
 		});
+	};
+
+	const openModal = () => {
+		setModalVisible(true);
+	};
+
+	const closeModal = () => {
+		setModalVisible(false);
 	};
 
 	const addPhoneNumber = () => {
@@ -302,6 +302,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 				doneButtonColor="#33BE99"
 				modalContent={
 					<View style={styles.modalContentContainer}>
+						<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 						<View style={styles.carouselContainer}>
 							<Carousel letter={firstName ? firstName[0].toUpperCase() : "?"} defaultColor={colorMapping[color]} setIndex={setColor} />
 						</View>

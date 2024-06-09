@@ -297,7 +297,6 @@ const GroupsScreen = ({ navigation }) => {
 
 	return (
 		<View style={styles.container}>
-			<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 			<Text style={styles.title}>Groups</Text>
 
 			<ControlButton source={require("../../../../assets/images/Add.png")} size={36} style={styles.add} onPress={openModal} />
@@ -345,6 +344,7 @@ const GroupsScreen = ({ navigation }) => {
 				doneButtonColor="#33BE99"
 				modalContent={
 					<Animated.View style={{ opacity: fadeAnim }}>
+						<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 						{currentStep === 1 ? (
 							<View style={styles.modalContainer}>
 								<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
