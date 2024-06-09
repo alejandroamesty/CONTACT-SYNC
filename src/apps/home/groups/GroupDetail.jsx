@@ -35,6 +35,7 @@ const GroupDetail = ({ route }) => {
 	const [severity, setSeverity] = useState("error");
 	const [restart, setRestart] = useState(false);
 	const [message, setMessage] = useState("");
+	const [deleteGroupModal, setDeleteGroupModal] = useState(false);
 
 	const colors = [
 		{ id: 1, color: "#FFAC20" },
@@ -373,6 +374,18 @@ const GroupDetail = ({ route }) => {
 		resetAllItems();
 	};
 
+	const openDeleteGroupModal = () => {
+		setDeleteGroupModal(true);
+	};
+
+	const onCancelDeleteGroup = () => {
+		setDeleteGroupModal(false);
+	};
+
+	const onAcceptDeleteGroup = () => {
+		deleteGroup();
+	};
+
 	const resetAllItems = () => {
 		setResetItem(Date.now());
 	};
@@ -412,7 +425,18 @@ const GroupDetail = ({ route }) => {
 						)}
 						<View style={styles.member_addContainer}>
 							<Text style={styles.memberCount}>{`${contactCount} ` + (contactCount === 1 ? "member" : "members")}</Text>
-							<SmallAddButton onPress={openModal} buttonText={"add"} />
+							<View style={styles.buttonsContainer}>
+								<SmallAddButton onPress={openModal} buttonText={"add"} style={styles.addButton} />
+								{id > 2 && (
+									<View>
+										<SmallAddButton
+											onPress={openDeleteGroupModal}
+											buttonText={"delete"}
+											iconSource={require("../../../../assets/images/Remove.png")}
+										/>
+									</View>
+								)}
+							</View>
 						</View>
 
 						<BlueInput
@@ -529,6 +553,16 @@ const GroupDetail = ({ route }) => {
 					/>
 				</View>
 				<ConfirmationModal
+					visible={deleteGroupModal}
+					image={require("../../../../assets/images/DeleteModal.png")}
+					title="Delete group"
+					text="Are you sure you want to permanently delete this group?"
+					cancelButtonText="CANCEL"
+					acceptButtonText="ACCEPT"
+					onCancel={onCancelDeleteGroup}
+					onAccept={() => onAcceptDeleteGroup()}
+				/>
+				<ConfirmationModal
 					visible={deleteModal}
 					image={require("../../../../assets/images/DeleteModal.png")}
 					title="Remove contact"
@@ -589,7 +623,7 @@ const styles = StyleSheet.create({
 		color: "#FFF",
 		color: "#FFFFFF",
 		fontFamily: "BROmnyRegular",
-		fontSize: 25,
+		fontSize: 20,
 	},
 	description: {
 		marginTop: 20,
@@ -632,7 +666,6 @@ const styles = StyleSheet.create({
 		marginBottom: 30,
 	},
 	buttonsContainer: {
-		padding: 10,
 		flexDirection: "row",
 		justifyContent: "space-between",
 	},
@@ -643,10 +676,15 @@ const styles = StyleSheet.create({
 		width: 415,
 		marginTop: 15,
 	},
+
 	messageBarContainer: {
 		position: "absolute",
 		alignSelf: "center",
 		top: -34,
 	},
 	addMessageBarContainer: { position: "absolute", alignSelf: "center", top: -475 },
+
+	addButton: {
+		marginRight: 10,
+	},
 });

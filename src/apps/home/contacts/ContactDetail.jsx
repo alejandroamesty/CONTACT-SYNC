@@ -260,12 +260,12 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 			</View>
 			<View style={styles.contactContainer}>
 				<View style={[styles.userIcon, { backgroundColor: colorMapping[color] }]}>
-					<Text style={styles.firstNameInitial}>{firstName[0]}</Text>
+					<Text style={styles.firstNameInitial}>{firstName[0] || "?"}</Text>
 				</View>
 				<Text style={styles.name}>
-					{firstName} {lastName}
+					{firstName && lastName ? `${firstName} ${lastName}` : "Create your contact card"}
 				</Text>
-				<Text style={styles.alias}>{alias ? `"${alias}"` : ""}</Text>
+				<Text style={styles.alias}>{alias ? `"${alias}"` : "" || 'Go to "Profile" and click the edit button'}</Text>
 			</View>
 			<ScrollView style={styles.container} indicatorStyle="white">
 				<View style={styles.infoContainer}>

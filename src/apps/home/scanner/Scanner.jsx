@@ -42,6 +42,7 @@ const Scanner = () => {
 	const [severity, setSeverity] = useState("error");
 	const [restart, setRestart] = useState(false);
 	const [message, setMessage] = useState("");
+	const [errorMessage, setErrorMessage] = useState("");
 
 	const colors = ["#FFAC20", "#FF7246", "#FF4574", "#FF38EB", "#0684FE", "#33BE99"];
 
@@ -250,6 +251,7 @@ const Scanner = () => {
 
 	function closeModal() {
 		setModalVisible(false);
+		setErrorMessage("");
 	}
 
 	const addPhoneNumber = () => {
@@ -414,6 +416,7 @@ const Scanner = () => {
 											/>
 										))}
 										<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
+										<Text style={styles.errorMessage}>{errorMessage}</Text>
 										<Text style={styles.sectionTitle}>Emails</Text>
 										{emails.map((email, index) => (
 											<EmailInput
@@ -515,7 +518,7 @@ const styles = StyleSheet.create({
 	},
 	nameText: {
 		fontSize: 24,
-		fontWeight: "BROmnyRegular",
+		fontFamily: "BROmnyRegular",
 		color: "black",
 		paddingTop: 10,
 		paddingBottom: 15,
@@ -524,7 +527,7 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		top: 100,
 		fontSize: 24,
-		fontWeight: "BROmnyRegular",
+		fontFamily: "BROmnyRegular",
 		color: "#8C91B4",
 		paddingBottom: 20,
 	},
@@ -543,8 +546,42 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		height: 366,
 	},
+
 	messageBarContainer: {
 		position: "absolute",
 		top: -195,
+	},
+	carouselContainer: {
+		marginLeft: -20,
+		marginRight: -20,
+	},
+	modalContentContainer: {
+		alignItems: "center",
+	},
+	modalContainer: {
+		alignItems: "center",
+	},
+	inputContact: {
+		marginTop: 20,
+		alignSelf: "center",
+	},
+	input: {
+		marginBottom: 12,
+	},
+	lastInput: {
+		marginBottom: 0,
+	},
+	sectionTitle: {
+		fontSize: 18,
+		fontFamily: "BROmnyMedium",
+		color: "#000",
+		marginTop: 20,
+		marginBottom: 10,
+	},
+	errorMessage: {
+		color: "#F50000",
+		fontSize: 16,
+		fontFamily: "BROmnyRegular",
+		marginTop: 10,
 	},
 });
