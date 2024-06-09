@@ -77,7 +77,6 @@ const GroupsScreen = ({ navigation }) => {
 							fetchedGroups.groups.forEach((group) => {
 								newGroups.push(group);
 							});
-							setGroups(newGroups);
 							setBaseGroups(newGroups);
 							setUpdateGroups(true);
 						})
@@ -152,7 +151,7 @@ const GroupsScreen = ({ navigation }) => {
 			sortGroups();
 			setUpdateGroups(false);
 		}
-	}, [groups]);
+	}, [baseGroups]);
 
 	const openModal = () => {
 		setModalVisible(true);
