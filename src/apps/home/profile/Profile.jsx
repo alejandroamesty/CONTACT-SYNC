@@ -339,7 +339,18 @@ const Profile = ({ navigation }) => {
 							<Text style={styles.title}>Profile</Text>
 
 							<View style={styles.buttons}>
-								<TouchableOpacity onPress={() => navigation.navigate("MyContactDetail", { contact: yourContact })}>
+									<TouchableOpacity
+										onPress={() => {
+											if (Object.keys(yourContact).length > 0) {
+											navigation.navigate("MyContactDetail", { contact: yourContact });
+											} else {
+												setSeverity("error");
+												setMessage("Create your contact card first");
+												setShowMessage(true);
+												setRestart(true);
+											}
+										}}
+									>
 									<View style={styles.card}>
 										<ControlButton
 											source={require("../../../../assets/images/Profile/Edit.png")}
