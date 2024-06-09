@@ -39,4 +39,3 @@ yarn-error.*
 .app.json
 .babel.config.js
 .eas.json
-.android/

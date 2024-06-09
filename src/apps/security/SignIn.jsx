@@ -20,8 +20,6 @@ const SignIn = ({ navigation }) => {
 	}, [email, password]);
 
 	async function handleSignIn() {
-		console.log("Signing in");
-		console.log(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/login`);
 		if (email === "" || password === "") {
 			console.log("Empty fields");
 			return;
