@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -18,7 +18,7 @@ import Animated, {
 import {
     FlingGestureHandler,
     Directions,
-    GestureHandlerRootView,
+    State,
 } from "react-native-gesture-handler";
 
 const { width } = Dimensions.get("window");
@@ -43,8 +43,15 @@ const chooseColor = (index) => {
     }
 };
 
-const SwipeToDelete = ({ item, onDeleteLeft, onDeleteRight, onPress, reset }) => {
+const SwipeToDelete = ({
+    item,
+    onDeleteLeft,
+    onDeleteRight,
+    onPress,
+    reset,
+}) => {
     const translateX = useSharedValue(0);
+    const [startX, setStartX] = useState(0);
 
     useEffect(() => {
         if (reset) {
@@ -87,21 +94,32 @@ const SwipeToDelete = ({ item, onDeleteLeft, onDeleteRight, onPress, reset }) =>
         };
     });
 
-    const handleGestureLeft = () => {
-        translateX.value = withTiming(-width, { duration: 500 }, () => {
-            runOnJS(onDeleteRight)(item.id);
-        });
-    };
-
-    const handleGestureRight = () => {
-        translateX.value = withTiming(width, { duration: 500 }, () => {
-            runOnJS(onDeleteLeft)(item.id);
-        });
+    const handleGesture = ({ nativeEvent }) => {
+        if (nativeEvent.state === State.BEGAN) {
+            setStartX(nativeEvent.absoluteX);
+        }
+        if (nativeEvent.state === State.ACTIVE) {
+            if (
+                typeof startX !== "undefined" &&
+                nativeEvent.absoluteX - startX > 0
+            ) {
+                translateX.value = withTiming(width, { duration: 500 }, () => {
+                    runOnJS(onDeleteLeft)(item.id);
+                });
+            } else {
+                translateX.value = withTiming(-width, { duration: 500 }, () => {
+                    runOnJS(onDeleteRight)(item.id);
+                });
+            }
+        }
     };
 
     return (
-        <GestureHandlerRootView>
-            <View style={styles.container}>
+        <FlingGestureHandler
+            direction={Directions.LEFT | Directions.RIGHT}
+            onHandlerStateChange={handleGesture}
+        >
+            <Animated.View style={styles.container}>
                 <TouchableOpacity onPress={() => onPress(item)}>
                     <Animated.View
                         style={[styles.background, backgroundColor]}
@@ -118,47 +136,37 @@ const SwipeToDelete = ({ item, onDeleteLeft, onDeleteRight, onPress, reset }) =>
                             style={styles.icon}
                         />
                     </Animated.View>
-                    <FlingGestureHandler
-                        direction={Directions.LEFT}
-                        onEnded={handleGestureLeft}
+                    <Animated.View
+                        style={[styles.itemContainer, animatedStyle]}
                     >
-                        <FlingGestureHandler
-                            direction={Directions.RIGHT}
-                            onEnded={handleGestureRight}
-                        >
-                            <Animated.View
-                                style={[styles.itemContainer, animatedStyle]}
+                        <View style={styles.contactItem}>
+                            <View
+                                style={[
+                                    styles.contactIcon,
+                                    {
+                                        backgroundColor: chooseColor(
+                                            item.color
+                                        ),
+                                    },
+                                ]}
                             >
-                                <View style={styles.contactItem}>
-                                    <View
-                                        style={[
-                                            styles.contactIcon,
-                                            {
-                                                backgroundColor: chooseColor(
-                                                    item.color
-                                                ),
-                                            },
-                                        ]}
-                                    >
-                                        <Text style={styles.contactIconText}>
-                                            {item.first_name[0].toUpperCase()}
-                                        </Text>
-                                    </View>
-                                    <View style={styles.contactInfo}>
-                                        <Text style={styles.contactName}>
-                                            {item.first_name} {item.last_name}
-                                        </Text>
-                                        <Text
-                                            style={styles.contactPhone}
-                                        >{`+${item.phone_code} ${item.phone_number}`}</Text>
-                                    </View>
-                                </View>
-                            </Animated.View>
-                        </FlingGestureHandler>
-                    </FlingGestureHandler>
+                                <Text style={styles.contactIconText}>
+                                    {item.first_name[0].toUpperCase()}
+                                </Text>
+                            </View>
+                            <View style={styles.contactInfo}>
+                                <Text style={styles.contactName}>
+                                    {item.first_name} {item.last_name}
+                                </Text>
+                                <Text style={styles.contactPhone}>
+                                    {`+${item.phone_code} ${item.phone_number}`}
+                                </Text>
+                            </View>
+                        </View>
+                    </Animated.View>
                 </TouchableOpacity>
-            </View>
-        </GestureHandlerRootView>
+            </Animated.View>
+        </FlingGestureHandler>
     );
 };
 
@@ -176,7 +184,6 @@ const styles = StyleSheet.create({
         top: 0,
         bottom: 0,
         width: 100,
-        borderTopStartRadius: 20,
         justifyContent: "center",
         alignItems: "center",
     },
@@ -196,23 +203,8 @@ const styles = StyleSheet.create({
         height: 60,
         padding: 14,
         backgroundColor: "#121B4A",
-        borderRadius: 5,
-        elevation: 5,
         borderRadius: 25,
-    },
-    itemText: {
-        fontSize: 16,
-        color: "white",
-    },
-    iconContainer: {
-        marginRight: 10,
-    },
-    textContainer: {
-        flex: 1,
-    },
-    icon: {
-        width: 30,
-        height: 30,
+        elevation: 5,
     },
     contactItem: {
         flexDirection: "row",
@@ -248,6 +240,10 @@ const styles = StyleSheet.create({
         fontWeight: "260",
         fontSize: 14,
         color: "#FFFFFF",
+    },
+    icon: {
+        width: 30,
+        height: 30,
     },
 });
 
