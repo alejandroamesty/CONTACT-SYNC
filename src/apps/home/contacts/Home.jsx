@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { StyleSheet, View, Text, FlatList, Animated, BackHandler } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { API_URL, API_PORT } from "@env";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import ContactDetail from "./ContactDetail";
 
@@ -263,18 +264,17 @@ const HomeScreen = ({ navigation }) => {
 
 	const addContact = () => {
 		if (doneClicked) return;
-		setDoneClicked(true);
 		let newDates = [];
 		dates.forEach((date, index) => {
 			newDates.push({ ...date, date: `${date.date.getDate()}-${date.date.getMonth() + 1}-${date.date.getFullYear()}` });
-		});
-		console.log("Dates:", newDates);
-
-		if (!firstName || phoneNumbers[0].phoneNumber === "" || phoneNumbers[0].phoneCode === "") {
-			console.log("First name and phone number are required");
-			return;
-		}
-
+			});
+			console.log("Dates:", newDates);
+			
+			if (!firstName || phoneNumbers[0].phoneNumber === "" || phoneNumbers[0].phoneCode === "") {
+				console.log("First name and phone number are required");
+				return;
+			}
+		setDoneClicked(true);
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
 			method: "POST",
 			headers: {
@@ -321,7 +321,7 @@ const HomeScreen = ({ navigation }) => {
 	};
 
 	const deleteContact = (contactId) => {
-		fetch(`${API_URL}:${API_PORT}/deleteContact`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/ydeleteContact`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
@@ -352,7 +352,7 @@ const HomeScreen = ({ navigation }) => {
 	};
 
 	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getAllContactsAndGroups`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getAllContactsAndGroups`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -385,7 +385,7 @@ const HomeScreen = ({ navigation }) => {
 
 	const fetchGroups = async (id) => {
 		try {
-			const response = await fetch(`${API_URL}:${API_PORT}/getGroups`, {
+			const response = await fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getGroups`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -458,6 +458,7 @@ const HomeScreen = ({ navigation }) => {
 	};
 
 	return (
+	<GestureHandlerRootView>
 		<View style={styles.container}>
 			<Text style={styles.title}>Hello</Text>
 			<Text style={styles.subtitle}>{yourAlias ? yourAlias : yourName ? yourName : "User"}</Text>
@@ -608,6 +609,7 @@ const HomeScreen = ({ navigation }) => {
 				onAccept={() => onAccept(selectedContactId)}
 			/>
 		</View>
+	</GestureHandlerRootView>
 	);
 };
 

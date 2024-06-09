@@ -27,7 +27,7 @@ const VerifyCode = ({ navigation, route }) => {
 		};
 
 		try {
-			const response = await fetch(`${API_URL}:${API_PORT}/recoveryCode`, {
+			const response = await fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/recoveryCode`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

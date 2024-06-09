@@ -288,7 +288,7 @@ const GroupDetail = ({ route }) => {
 	};
 
 	const deleteGroup = () => {
-		fetch(`${API_URL}:${API_PORT}/deleteGroup`, {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/deleteGroup`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
@@ -315,7 +315,7 @@ const GroupDetail = ({ route }) => {
 	};
 
     const deleteContactFromGroup = (contactId) => {
-        fetch(`${API_URL}:${API_PORT}/deleteContactFromGroup`, {
+        fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/deleteContactFromGroup`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

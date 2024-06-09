@@ -27,7 +27,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
 		}
 
 		try {
-			const response = await fetch(`${API_URL}:${API_PORT}/forgotPassword`, {
+			const response = await fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/forgotPassword`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
