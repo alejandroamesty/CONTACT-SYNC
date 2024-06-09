@@ -36,7 +36,7 @@ const ResetPassword = ({ navigation, route }) => {
 
         try {
             const response = await fetch(
-                `${API_URL}:${API_PORT}/recoveryPassword`,
+                `${API_URL}${API_PORT ? ":" + API_PORT : ""}/recoveryPassword`,
                 {
                     method: "POST",
                     headers: {
