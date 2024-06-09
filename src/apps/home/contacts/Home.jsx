@@ -161,6 +161,7 @@ const HomeScreen = ({ navigation }) => {
 
 	const closeModal = () => {
 		setPhoneNumbers([{ type: "home", phoneType: 1, phoneCode: "", phoneNumber: "" }]);
+		setDoneClicked(false);
 		setEmails([]);
 		setURLs([]);
 		setDates([]);
@@ -293,6 +294,7 @@ const HomeScreen = ({ navigation }) => {
 			}),
 		})
 			.then((response) => {
+				console.log(response);
 				if (response.status === 200) {
 					response.text().then((text) => {
 						fetchContacts();
@@ -308,6 +310,7 @@ const HomeScreen = ({ navigation }) => {
 					response.text().then((text) => {
 						text = JSON.parse(text);
 						setErrorMessage(text.message);
+						console.log(text);
 						setDoneClicked(false);
 					});
 				}
@@ -529,12 +532,12 @@ const HomeScreen = ({ navigation }) => {
 									<Text style={styles.sectionTitle}>Phone Numbers</Text>
 									{phoneNumbers.map((phone, index) => (
 										<PhoneInput
-										key={index}
-										phone={phone}
-										setPhone={(newPhone) => setPhone(index, newPhone)}
-										removePhone={() => removePhone(index)}
+											key={index}
+											phone={phone}
+											setPhone={(newPhone) => setPhone(index, newPhone)}
+											removePhone={() => removePhone(index)}
 										/>
-										))}
+									))}
 									<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
 									<Text style={styles.errorMessage}>{errorMessage}</Text>
 									<Text style={styles.sectionTitle}>Emails</Text>
