@@ -10,6 +10,7 @@ import GrayInput from "../../../components/inputs/GrayInput";
 import Carousel from "../../../components/Carousel";
 import CustomModal from "../../../components/modals/CustomModal";
 import DateInput from "../../../components/inputs/DateInput";
+import MessageBar from "../../../components/MessageBar";
 import { API_URL, API_PORT } from "@env";
 
 const ContactDetail = ({ route, navigation: { goBack } }) => {
@@ -33,6 +34,9 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 	const [displayEmails, setDisplayEmails] = useState([]);
 	const [displayURLs, setDisplayURLs] = useState([]);
 	const [displayDates, setDisplayDates] = useState([]);
+	const [severity, setSeverity] = useState("error");
+	const [restart, setRestart] = useState(false);
+	const [message, setMessage] = useState("");
 
 	const colorMapping = {
 		1: "#FFAC20",
@@ -173,7 +177,9 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 			} else {
 				console.log("Error:", response.status);
 				response.text().then((text) => {
-					console.log(text);
+					setSeverity("error");
+					setMessage(text.message);
+					setRestart(true);
 				});
 			}
 		});
@@ -301,103 +307,111 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 				cancelButtonColor="#F50"
 				doneButtonColor="#33BE99"
 				modalContent={
-					<View style={styles.modalContentContainer}>
-						<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
-						<View style={styles.carouselContainer}>
-							<Carousel letter={firstName ? firstName[0].toUpperCase() : "?"} defaultColor={colorMapping[color]} setIndex={setColor} />
+					<>
+						<View style={styles.messageBarContainer}>
+							<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 						</View>
-						<FlatList
-							style={styles.list}
-							ListHeaderComponent={
-								<>
-									<GrayInput
-										placeholder="First name"
-										style={styles.input}
-										value={firstName}
-										onChangeText={setFirstName}
-										defaultValue={firstName}
-										characterLimit={40}
-									/>
-									<GrayInput
-										placeholder="Last name"
-										style={styles.input}
-										value={lastName}
-										onChangeText={setLastName}
-										defaultValue={lastName}
-										characterLimit={40}
-									/>
-									<GrayInput
-										placeholder="Alias"
-										style={styles.input}
-										value={alias}
-										onChangeText={setAlias}
-										defaultValue={alias}
-										characterLimit={15}
-									/>
-									<GrayInput
-										placeholder="Company"
-										style={styles.input}
-										value={company}
-										onChangeText={setCompany}
-										defaultValue={company}
-										characterLimit={20}
-									/>
-									<GrayInput
-										placeholder="Address"
-										style={[styles.input, styles.lastInput]}
-										value={address}
-										onChangeText={setAddress}
-										defaultValue={address}
-										characterLimit={100}
-									/>
-								</>
-							}
-							ListFooterComponent={
-								<>
-									<Text style={styles.sectionTitle}>Phone Numbers</Text>
-									{phoneNumbers.map((phone, index) => (
-										<PhoneInput
-											key={index}
-											phone={phone}
-											setPhone={(newPhone) => setPhone(index, newPhone)}
-											removePhone={() => removePhone(index)}
+						<View style={styles.modalContentContainer}>
+							<View style={styles.carouselContainer}>
+								<Carousel
+									letter={firstName ? firstName[0].toUpperCase() : "?"}
+									defaultColor={colorMapping[color]}
+									setIndex={setColor}
+								/>
+							</View>
+							<FlatList
+								style={styles.list}
+								ListHeaderComponent={
+									<>
+										<GrayInput
+											placeholder="First name"
+											style={styles.input}
+											value={firstName}
+											onChangeText={setFirstName}
+											defaultValue={firstName}
+											characterLimit={40}
 										/>
-									))}
-									<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
-									<Text style={styles.sectionTitle}>Emails</Text>
-									{emails.map((email, index) => (
-										<EmailInput
-											key={index}
-											data={email}
-											setData={(newEmail) => setEmail(index, newEmail)}
-											removeData={() => removeEmail(index)}
+										<GrayInput
+											placeholder="Last name"
+											style={styles.input}
+											value={lastName}
+											onChangeText={setLastName}
+											defaultValue={lastName}
+											characterLimit={40}
 										/>
-									))}
-									<AddButton onPress={addEmail} buttonText="add email" />
-									<Text style={styles.sectionTitle}>URLs</Text>
-									{urls.map((url, index) => (
-										<URLInput
-											key={index}
-											data={url}
-											setData={(newURL) => setURL(index, newURL)}
-											removeData={() => removeURL(index)}
+										<GrayInput
+											placeholder="Alias"
+											style={styles.input}
+											value={alias}
+											onChangeText={setAlias}
+											defaultValue={alias}
+											characterLimit={15}
 										/>
-									))}
-									<AddButton onPress={addURL} buttonText="add URL" />
-									<Text style={styles.sectionTitle}>Dates</Text>
-									{dates.map((date, index) => (
-										<DateInput
-											key={index}
-											data={date}
-											setData={(newDate) => setDate(index, newDate)}
-											removeData={() => removeDate(index)}
+										<GrayInput
+											placeholder="Company"
+											style={styles.input}
+											value={company}
+											onChangeText={setCompany}
+											defaultValue={company}
+											characterLimit={20}
 										/>
-									))}
-									<AddButton onPress={addDate} buttonText="add date" />
-								</>
-							}
-						/>
-					</View>
+										<GrayInput
+											placeholder="Address"
+											style={[styles.input, styles.lastInput]}
+											value={address}
+											onChangeText={setAddress}
+											defaultValue={address}
+											characterLimit={100}
+										/>
+									</>
+								}
+								ListFooterComponent={
+									<>
+										<Text style={styles.sectionTitle}>Phone Numbers</Text>
+										{phoneNumbers.map((phone, index) => (
+											<PhoneInput
+												key={index}
+												phone={phone}
+												setPhone={(newPhone) => setPhone(index, newPhone)}
+												removePhone={() => removePhone(index)}
+											/>
+										))}
+										<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
+										<Text style={styles.sectionTitle}>Emails</Text>
+										{emails.map((email, index) => (
+											<EmailInput
+												key={index}
+												data={email}
+												setData={(newEmail) => setEmail(index, newEmail)}
+												removeData={() => removeEmail(index)}
+											/>
+										))}
+										<AddButton onPress={addEmail} buttonText="add email" />
+										<Text style={styles.sectionTitle}>URLs</Text>
+										{urls.map((url, index) => (
+											<URLInput
+												key={index}
+												data={url}
+												setData={(newURL) => setURL(index, newURL)}
+												removeData={() => removeURL(index)}
+											/>
+										))}
+										<AddButton onPress={addURL} buttonText="add URL" />
+										<Text style={styles.sectionTitle}>Dates</Text>
+										{dates.map((date, index) => (
+											<DateInput
+												key={index}
+												data={date}
+												setData={(newDate) => setDate(index, newDate)}
+												removeData={() => removeDate(index)}
+											/>
+										))}
+										<AddButton onPress={addDate} buttonText="add date" />
+									</>
+								}
+							/>
+						</View>
+					</>
 				}
 			/>
 		</View>
@@ -498,4 +512,10 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		marginBottom: 10,
 	},
+	messageBarContainer: {
+		position: "absolute",
+		alignSelf: "center",
+		top: -60,
+	},
+	addMessageBarContainer: { position: "absolute", alignSelf: "center", top: -475 },
 });

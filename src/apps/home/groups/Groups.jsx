@@ -165,24 +165,6 @@ const GroupsScreen = ({ navigation }) => {
 			});
 	};
 
-	const sortGroups = () => {
-		// First compare group_name with search text
-		// Sort the groups in groups state alphabetically by name except for the first two groups
-
-		const filteredGroups = baseGroups.filter((group) => group.group_name.toLowerCase().includes(searchText.toLowerCase()));
-		const sortedGroups = [...filteredGroups];
-		sortedGroups.sort((a, b) => {
-			if (a.id === 2 || a.id === 1) {
-				return -1;
-			} else if (b.id === 2 || b.id === 1) {
-				return 1;
-			} else {
-				return a.group_name.localeCompare(b.group_name);
-			}
-		});
-		setGroups(sortedGroups);
-	};
-
 	const createGroup = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createGroup`, {
 			method: "POST",
@@ -227,12 +209,16 @@ const GroupsScreen = ({ navigation }) => {
 								} else {
 									console.log(response.status);
 									response.text().then((text) => {
-										console.log(text);
+										setSeverity("error");
+										setMessage(text.message);
+										setRestart(true);
 									});
 								}
 							})
 							.catch((error) => {
-								console.log("Error:", error);
+								setSeverity("error");
+								setMessage("Error on adding contacts");
+								setRestart(true);
 							});
 					});
 				} else if (response.status === 401) {
@@ -241,13 +227,33 @@ const GroupsScreen = ({ navigation }) => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						console.log(text);
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
 					});
 				}
 			})
 			.catch((error) => {
 				console.log("Error:", error);
 			});
+	};
+
+	const sortGroups = () => {
+		// First compare group_name with search text
+		// Sort the groups in groups state alphabetically by name except for the first two groups
+
+		const filteredGroups = baseGroups.filter((group) => group.group_name.toLowerCase().includes(searchText.toLowerCase()));
+		const sortedGroups = [...filteredGroups];
+		sortedGroups.sort((a, b) => {
+			if (a.id === 2 || a.id === 1) {
+				return -1;
+			} else if (b.id === 2 || b.id === 1) {
+				return 1;
+			} else {
+				return a.group_name.localeCompare(b.group_name);
+			}
+		});
+		setGroups(sortedGroups);
 	};
 
 	const handleChangeText = (text) => {
@@ -344,7 +350,9 @@ const GroupsScreen = ({ navigation }) => {
 				doneButtonColor="#33BE99"
 				modalContent={
 					<Animated.View style={{ opacity: fadeAnim }}>
-						<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
+						<View style={styles.messageBarContainer}>
+							<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
+						</View>
 						{currentStep === 1 ? (
 							<View style={styles.modalContainer}>
 								<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
@@ -461,5 +469,9 @@ const styles = StyleSheet.create({
 		width: 415,
 		height: 500,
 		marginTop: 15,
+	},
+	messageBarContainer: {
+		position: "absolute",
+		top: -195,
 	},
 });

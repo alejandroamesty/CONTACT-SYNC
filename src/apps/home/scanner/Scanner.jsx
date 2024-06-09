@@ -16,6 +16,7 @@ import URLInput from "../../../components/inputs/URLInput";
 import DateInput from "../../../components/inputs/DateInput";
 import AddButton from "../../../components/buttons/AddButton";
 import Carousel from "../../../components/Carousel";
+import MessageBar from "../../../components/MessageBar";
 
 const containerWidth = Dimensions.get("window").width * 0.75;
 const otherWidth = Dimensions.get("window").width * 0.6;
@@ -38,14 +39,9 @@ const Scanner = () => {
 	const [yourName, setYourName] = useState("");
 	const [firstLetter, setFirstLetter] = useState("?");
 	const [yourColor, setYourColor] = useState(1);
-
-	useEffect(() => {
-		const handleBackButton = () => true;
-		BackHandler.addEventListener("hardwareBackPress", handleBackButton);
-		return () => {
-			BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
-		};
-	}, []);
+	const [severity, setSeverity] = useState("error");
+	const [restart, setRestart] = useState(false);
+	const [message, setMessage] = useState("");
 
 	const colors = ["#FFAC20", "#FF7246", "#FF4574", "#FF38EB", "#0684FE", "#33BE99"];
 
@@ -58,20 +54,47 @@ const Scanner = () => {
 		6: "#33BE99",
 	};
 
-	const [qrValue, setQRValue] = useState(`{
-	firstName: "",
-	lastName: "",
-	alias: "",
-	company: "",
-	address: "",
-	color: "",
-	phones: [],
-	emails: [],
-	urls: [],
-	dates: [],
-}`);
+	const emailTypes = [
+		{ id: 1, label: "home", value: "home" },
+		{ id: 2, label: "work", value: "work" },
+		{ id: 3, label: "school", value: "school" },
+		{ id: 4, label: "office", value: "office" },
+		{ id: 5, label: "other", value: "other" },
+	];
+
+	const phoneTypes = [
+		{ id: 1, label: "home", value: "home" },
+		{ id: 2, label: "mobile", value: "mobile" },
+		{ id: 3, label: "work", value: "work" },
+	];
+
+	const urlTypes = [
+		{ id: 1, label: "website", value: "website" },
+		{ id: 2, label: "Instagram", value: "Instagram" },
+		{ id: 3, label: "Twitter", value: "Twitter" },
+		{ id: 4, label: "office", value: "office" },
+		{ id: 5, label: "other", value: "other" },
+	];
+
+	const dateTypes = [
+		{ id: 1, label: "birthday", value: "birthday" },
+		{ id: 2, label: "anniversary", value: "anniversary" },
+		{ id: 3, label: "other", value: "other" },
+	];
 
 	useEffect(() => {
+		const handleBackButton = () => true;
+		BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+		return () => {
+			BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
+		};
+	}, []);
+
+	useEffect(() => {
+		getContactById();
+	}, []);
+
+	const getContactById = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=1`)
 			.then((response) => response.json())
 			.then((data) => {
@@ -101,35 +124,70 @@ const Scanner = () => {
 				);
 				setYourColor(data.contact.color ? data.contact.color : 1);
 			});
-	}, []);
+	};
 
-	const emailTypes = [
-		{ id: 1, label: "home", value: "home" },
-		{ id: 2, label: "work", value: "work" },
-		{ id: 3, label: "school", value: "school" },
-		{ id: 4, label: "office", value: "office" },
-		{ id: 5, label: "other", value: "other" },
-	];
+	const [qrValue, setQRValue] = useState(`{
+		firstName: "",
+		lastName: "",
+		alias: "",
+		company: "",
+		address: "",
+		color: "",
+		phones: [],
+		emails: [],
+		urls: [],
+		dates: [],
+	}`);
 
-	const phoneTypes = [
-		{ id: 1, label: "home", value: "home" },
-		{ id: 2, label: "mobile", value: "mobile" },
-		{ id: 3, label: "work", value: "work" },
-	];
+	const addContact = () => {
+		let newDates = [];
+		dates.forEach((date, index) => {
+			newDates.push({ ...date, date: `${date.date.getDate()}-${date.date.getMonth() + 1}-${date.date.getFullYear()}` });
+		});
+		if (!firstName || !phoneNumbers[0] || phoneNumbers[0].phoneNumber === "" || phoneNumbers[0].phoneCode === "") {
+			console.log("First name and phone number are required");
+			return;
+		}
 
-	const urlTypes = [
-		{ id: 1, label: "website", value: "website" },
-		{ id: 2, label: "Instagram", value: "Instagram" },
-		{ id: 3, label: "Twitter", value: "Twitter" },
-		{ id: 4, label: "office", value: "office" },
-		{ id: 5, label: "other", value: "other" },
-	];
-
-	const dateTypes = [
-		{ id: 1, label: "birthday", value: "birthday" },
-		{ id: 2, label: "anniversary", value: "anniversary" },
-		{ id: 3, label: "other", value: "other" },
-	];
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				firstName: firstName,
+				lastName: lastName,
+				alias: alias,
+				company: company,
+				address: address,
+				color: color,
+				phones: phoneNumbers,
+				emails: emails,
+				dates: newDates,
+				urls: urls,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response.text().then((text) => {
+						console.log(text);
+						closeModal();
+					});
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				setSeverity("error");
+				setMessage("Server error");
+				setRestart(true);
+			});
+	};
 
 	function onBarcodeScanned(data) {
 		handleScanner();
@@ -181,52 +239,6 @@ const Scanner = () => {
 		setDates(newDates);
 		openModal();
 	}
-
-	const addContact = () => {
-		let newDates = [];
-		dates.forEach((date, index) => {
-			newDates.push({ ...date, date: `${date.date.getDate()}-${date.date.getMonth() + 1}-${date.date.getFullYear()}` });
-		});
-		if (!firstName || !phoneNumbers[0] || phoneNumbers[0].phoneNumber === "" || phoneNumbers[0].phoneCode === "") {
-			console.log("First name and phone number are required");
-			return;
-		}
-
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				firstName: firstName,
-				lastName: lastName,
-				alias: alias,
-				company: company,
-				address: address,
-				color: color,
-				phones: phoneNumbers,
-				emails: emails,
-				dates: newDates,
-				urls: urls,
-			}),
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					response.text().then((text) => {
-						console.log(text);
-						closeModal();
-					});
-				} else {
-					console.log(response.status);
-					response.text().then((text) => {
-						console.log(text);
-					});
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
-	};
 
 	function handleScanner() {
 		setOpenScanner(!openScanner);
@@ -357,72 +369,86 @@ const Scanner = () => {
 				cancelButtonColor="#F50"
 				doneButtonColor="#33BE99"
 				modalContent={
-					<View style={styles.modalContentContainer}>
-						<View style={styles.carouselContainer}>
-							<Carousel letter={firstName ? firstName[0].toUpperCase() : "?"} setIndex={setColor} defaultColor={colorMapping[color]} />
+					<>
+						<View style={styles.messageBarContainer}>
+							<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 						</View>
-						<FlatList
-							style={styles.list}
-							ListHeaderComponent={
-								<>
-									<GrayInput placeholder="First name" style={styles.input} defaultValue={firstName} onChangeText={setFirstName} />
-									<GrayInput placeholder="Last name" style={styles.input} defaultValue={lastName} onChangeText={setLastName} />
-									<GrayInput placeholder="Alias" style={styles.input} defaultValue={alias} onChangeText={setAlias} />
-									<GrayInput placeholder="Company" style={styles.input} defaultValue={company} onChangeText={setCompany} />
-									<GrayInput
-										placeholder="Address"
-										style={[styles.input, styles.lastInput]}
-										defaultValue={address}
-										onChangeText={setAddress}
-									/>
-								</>
-							}
-							ListFooterComponent={
-								<>
-									<Text style={styles.sectionTitle}>Phone Numbers</Text>
-									{phoneNumbers.map((phone_number, index) => (
-										<PhoneInput
-											key={index}
-											phone={phone_number}
-											setPhone={(newPhone) => setPhone(index, newPhone)}
-											removePhone={() => removePhone(index)}
+						<View style={styles.modalContentContainer}>
+							<View style={styles.carouselContainer}>
+								<Carousel
+									letter={firstName ? firstName[0].toUpperCase() : "?"}
+									setIndex={setColor}
+									defaultColor={colorMapping[color]}
+								/>
+							</View>
+							<FlatList
+								style={styles.list}
+								ListHeaderComponent={
+									<>
+										<GrayInput
+											placeholder="First name"
+											style={styles.input}
+											defaultValue={firstName}
+											onChangeText={setFirstName}
 										/>
-									))}
-									<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
-									<Text style={styles.sectionTitle}>Emails</Text>
-									{emails.map((email, index) => (
-										<EmailInput
-											key={index}
-											data={email}
-											setData={(newEmail) => setEmail(index, newEmail)}
-											removeData={() => removeEmail(index)}
+										<GrayInput placeholder="Last name" style={styles.input} defaultValue={lastName} onChangeText={setLastName} />
+										<GrayInput placeholder="Alias" style={styles.input} defaultValue={alias} onChangeText={setAlias} />
+										<GrayInput placeholder="Company" style={styles.input} defaultValue={company} onChangeText={setCompany} />
+										<GrayInput
+											placeholder="Address"
+											style={[styles.input, styles.lastInput]}
+											defaultValue={address}
+											onChangeText={setAddress}
 										/>
-									))}
-									<AddButton onPress={addEmail} buttonText="add email" />
-									<Text style={styles.sectionTitle}>URLs</Text>
-									{urls.map((url, index) => (
-										<URLInput
-											key={index}
-											data={url}
-											setData={(newURL) => setURL(index, newURL)}
-											removeData={() => removeURL(index)}
-										/>
-									))}
-									<AddButton onPress={addURL} buttonText="add URL" />
-									<Text style={styles.sectionTitle}>Dates</Text>
-									{dates.map((date, index) => (
-										<DateInput
-											key={index}
-											data={date}
-											setData={(newDate) => setDate(index, newDate)}
-											removeData={() => removeDate(index)}
-										/>
-									))}
-									<AddButton onPress={addDate} buttonText="add date" />
-								</>
-							}
-						/>
-					</View>
+									</>
+								}
+								ListFooterComponent={
+									<>
+										<Text style={styles.sectionTitle}>Phone Numbers</Text>
+										{phoneNumbers.map((phone_number, index) => (
+											<PhoneInput
+												key={index}
+												phone={phone_number}
+												setPhone={(newPhone) => setPhone(index, newPhone)}
+												removePhone={() => removePhone(index)}
+											/>
+										))}
+										<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
+										<Text style={styles.sectionTitle}>Emails</Text>
+										{emails.map((email, index) => (
+											<EmailInput
+												key={index}
+												data={email}
+												setData={(newEmail) => setEmail(index, newEmail)}
+												removeData={() => removeEmail(index)}
+											/>
+										))}
+										<AddButton onPress={addEmail} buttonText="add email" />
+										<Text style={styles.sectionTitle}>URLs</Text>
+										{urls.map((url, index) => (
+											<URLInput
+												key={index}
+												data={url}
+												setData={(newURL) => setURL(index, newURL)}
+												removeData={() => removeURL(index)}
+											/>
+										))}
+										<AddButton onPress={addURL} buttonText="add URL" />
+										<Text style={styles.sectionTitle}>Dates</Text>
+										{dates.map((date, index) => (
+											<DateInput
+												key={index}
+												data={date}
+												setData={(newDate) => setDate(index, newDate)}
+												removeData={() => removeDate(index)}
+											/>
+										))}
+										<AddButton onPress={addDate} buttonText="add date" />
+									</>
+								}
+							/>
+						</View>
+					</>
 				}
 			/>
 		</View>
@@ -516,5 +542,9 @@ const styles = StyleSheet.create({
 	list: {
 		marginTop: 20,
 		height: 366,
+	},
+	messageBarContainer: {
+		position: "absolute",
+		top: -195,
 	},
 });

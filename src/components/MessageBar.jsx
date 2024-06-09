@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
 		top: 20.01,
 		backdropFilter: "blur(2px)",
 		borderRadius: 100,
-		zIndex: 1000,
 		flexDirection: "row",
 		alignItems: "center",
 		paddingHorizontal: 20,

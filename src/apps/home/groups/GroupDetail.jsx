@@ -10,6 +10,7 @@ import Carousel from "../../../components/Carousel";
 import NewTextButton from "../../../components/buttons/NewTextButton";
 import GroupContactList from "../../../components/lists/GroupContactList";
 import ConfirmationModal from "../../../components/modals/ConfirmationModal";
+import MessageBar from "../../../components/MessageBar";
 
 const GroupDetail = ({ route }) => {
 	const [allContacts, setAllContacts] = useState([]);
@@ -31,7 +32,10 @@ const GroupDetail = ({ route }) => {
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [resetItem, setResetItem] = useState(null);
 	const [selectedContactId, setSelectedContactId] = useState([]);
-	
+	const [severity, setSeverity] = useState("error");
+	const [restart, setRestart] = useState(false);
+	const [message, setMessage] = useState("");
+
 	const colors = [
 		{ id: 1, color: "#FFAC20" },
 		{ id: 2, color: "#FF7246" },
@@ -48,6 +52,7 @@ const GroupDetail = ({ route }) => {
 		5: "#0684FE",
 		6: "#33BE99",
 	};
+
 	const iconSource = {
 		Emergency: require("../../../../assets/images/GroupCard/Favorites.png"),
 		Favorites: require("../../../../assets/images/GroupCard/Emergency.png"),
@@ -55,6 +60,14 @@ const GroupDetail = ({ route }) => {
 	}[iconName];
 
 	useEffect(() => {
+		getContactsByGroup;
+	}, []);
+
+	useEffect(() => {
+		getContacts();
+	}, [contacts]);
+
+	const getContactsByGroup = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactsByGroup?id=${id}`, {
 			method: "GET",
 			headers: {
@@ -76,7 +89,9 @@ const GroupDetail = ({ route }) => {
 							setContacts(newContacts);
 						})
 						.catch((error) => {
-							console.log("Error:", error);
+							setSeverity("error");
+							setMessage("Error on getting contacts");
+							setRestart(true);
 						});
 				} else if (response.status === 401) {
 					console.log("No session found");
@@ -84,16 +99,20 @@ const GroupDetail = ({ route }) => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						console.log(text);
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
 					});
 				}
 			})
 			.catch((error) => {
-				console.log("Error:", error);
+				setSeverity("error");
+				setMessage("Error on getting contacts");
+				setRestart(true);
 			});
-	}, []);
+	};
 
-	useEffect(() => {
+	const getContacts = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
 			method: "GET",
 			headers: {
@@ -120,7 +139,9 @@ const GroupDetail = ({ route }) => {
 							filterContactsInGroupFromAll(newContacts);
 						})
 						.catch((error) => {
-							console.log("Error:", error);
+							setSeverity("error");
+							setMessage("Error on getting contacts");
+							setRestart(true);
 						});
 				} else if (response.status === 401) {
 					console.log("No session found");
@@ -128,14 +149,179 @@ const GroupDetail = ({ route }) => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						console.log(text);
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
 					});
 				}
 			})
 			.catch((error) => {
-				console.log("Error:", error);
+				setSeverity("error");
+				setMessage("Error on getting contacts");
+				setRestart(true);
 			});
-	}, [contacts]);
+	};
+
+	const updateGroup = () => {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactsByGroup?id=${id}`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response
+						.text()
+						.then((fetchedContacts) => {
+							fetchedContacts = JSON.parse(fetchedContacts);
+							const newContacts = [];
+							fetchedContacts.contacts.forEach((contact) => {
+								if (contact.id !== 1) {
+									newContacts.push(contact);
+								}
+							});
+							setContacts(newContacts);
+						})
+						.catch((error) => {
+							setSeverity("error");
+							setMessage("Error on getting contacts");
+							setRestart(true);
+						});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					response.text().then((text) => {
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				setSeverity("error");
+				setMessage("Error on getting contacts");
+				setRestart(true);
+			});
+	};
+
+	const addMembers = () => {
+		const selectedContacts = [];
+		let contactSum = 0;
+		allContacts.forEach((contact) => {
+			if (contact.checked) {
+				selectedContacts.push(contact.id);
+				contactSum++;
+			}
+		});
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/InsertMultipleContactToGroup`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				contactIds: selectedContacts,
+				groupId: id,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response.text().then((text) => {
+						updateGroup();
+						closeModal();
+						setContactCount(contactSum + contactCount);
+					});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				setSeverity("error");
+				setMessage("Error on getting contacts");
+				setRestart(true);
+			});
+	};
+
+	const editGroup = () => {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/updateGroup`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				id: id,
+				groupName: newGroupName === "" ? group_name : newGroupName,
+				color: groupColor,
+				groupDescription: newGroupDescription,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response.text().then((text) => {
+						setGroupName(newGroupName);
+						setGroupDescription(newGroupDescription);
+						setColor(groupColor);
+						updateGroup();
+						closeEditModal();
+					});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				setSeverity("error");
+				setMessage("Error on getting contacts");
+				setRestart(true);
+			});
+	};
+
+	const deleteContactFromGroup = (contactId) => {
+		fetch(`${API_URL}:${API_PORT}/deleteContactFromGroup`, {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				contactId: contactId,
+				groupId: id,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					setContacts((prevContacts) => prevContacts.filter((contact) => contact.id !== contactId));
+					closeDeleteModal();
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				setSeverity("error");
+				setMessage("Error on getting contacts");
+				setRestart(true);
+			});
+	};
 
 	const filterContactsInGroupFromAll = (contactsParams) => {
 		if (!contactsParams) {
@@ -173,148 +359,6 @@ const GroupDetail = ({ route }) => {
 		deleteContactFromGroup(contactId);
 	};
 
-	const updateGroup = () => {
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactsByGroup?id=${id}`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					response
-						.text()
-						.then((fetchedContacts) => {
-							fetchedContacts = JSON.parse(fetchedContacts);
-							const newContacts = [];
-							fetchedContacts.contacts.forEach((contact) => {
-								if (contact.id !== 1) {
-									newContacts.push(contact);
-								}
-							});
-							setContacts(newContacts);
-						})
-						.catch((error) => {
-							console.log("Error:", error);
-						});
-				} else if (response.status === 401) {
-					console.log("No session found");
-					navigation.navigate("SignIn");
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
-	};
-
-	const addMembers = () => {
-		const selectedContacts = [];
-		let contactSum = 0;
-		allContacts.forEach((contact) => {
-			if (contact.checked) {
-				selectedContacts.push(contact.id);
-				contactSum++;
-			}
-		});
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/InsertMultipleContactToGroup`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				contactIds: selectedContacts,
-				groupId: id,
-			}),
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					response.text().then((text) => {
-						console.log(text);
-						updateGroup();
-						closeModal();
-						setContactCount(contactSum + contactCount);
-					});
-				} else if (response.status === 401) {
-					console.log("No session found");
-					navigation.navigate("SignIn");
-				} else {
-					console.log(response.status);
-					response.text().then((text) => {
-						console.log(text);
-					});
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
-	};
-
-	const editGroup = () => {
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/updateGroup`, {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				id: id,
-				groupName: newGroupName === "" ? group_name : newGroupName,
-				color: groupColor,
-				groupDescription: newGroupDescription,
-			}),
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					response.text().then((text) => {
-						setGroupName(newGroupName);
-						setGroupDescription(newGroupDescription);
-						setColor(groupColor);
-						updateGroup();
-						closeEditModal();
-					});
-				} else if (response.status === 401) {
-					console.log("No session found");
-					navigation.navigate("SignIn");
-				} else {
-					console.log(response.status);
-					response.text().then((text) => {
-						console.log(text);
-					});
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
-	};
-
-    const deleteContactFromGroup = (contactId) => {
-        fetch(`${API_URL}:${API_PORT}/deleteContactFromGroup`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                contactId: contactId,
-                groupId: id,
-            }),
-        })
-            .then((response) => {
-                if (response.status === 200) {
-                    setContacts((prevContacts) => prevContacts.filter((contact) => contact.id !== contactId));
-					console.log("Contact deleted from group");
-                    console.log(contactId);
-					closeDeleteModal();
-                } else {
-                    console.log(response.status);
-                    response.text().then((text) => {
-                        console.log(text);
-                    });
-                }
-            })
-            .catch((error) => {
-                console.log("Error:", error);
-            });
-    };
-
 	const openDeleteModal = (contactId) => {
 		setSelectedContactId(contactId);
 		setDeleteModal(true);
@@ -340,6 +384,7 @@ const GroupDetail = ({ route }) => {
 				style={{ backgroundColor: "#030B38" }}
 				ListHeaderComponent={
 					<View style={styles.container}>
+						<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 						<View style={[styles.colorCircle, { backgroundColor: colors[color - 1].color }]}>
 							{<Image source={iconSource} style={styles.image} />}
 						</View>
@@ -385,7 +430,13 @@ const GroupDetail = ({ route }) => {
 				}
 				renderItem={() => (
 					<View style={styles.contactsContainer}>
-						<GroupContactList contacts={filteredContacts} deleteContactFromGroup={openDeleteModal} navigation={navigation} reset={resetItem} selectedContactId={selectedContactId} />
+						<GroupContactList
+							contacts={filteredContacts}
+							deleteContactFromGroup={openDeleteModal}
+							navigation={navigation}
+							reset={resetItem}
+							selectedContactId={selectedContactId}
+						/>
 					</View>
 				)}
 				ListFooterComponent={
@@ -401,14 +452,19 @@ const GroupDetail = ({ route }) => {
 							cancelButtonColor="#F50000"
 							doneButtonColor="#33BE99"
 							modalContent={
-								<Animated.View style={{ opacity: fadeAnim }}>
-									<View style={styles.groupModalContainer}>
-										<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
-										<View style={styles.membersList}>
-											<List data={allContacts} setExternalList={setAllContacts} />
-										</View>
+								<>
+									<View style={styles.addMessageBarContainer}>
+										<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 									</View>
-								</Animated.View>
+									<Animated.View style={{ opacity: fadeAnim }}>
+										<View style={styles.groupModalContainer}>
+											<GrayInput placeholder="Search name or number" image={require("../../../../assets/images/Search.png")} />
+											<View style={styles.membersList}>
+												<List data={allContacts} setExternalList={setAllContacts} />
+											</View>
+										</View>
+									</Animated.View>
+								</>
 							}
 						/>
 						<CustomModal
@@ -422,31 +478,36 @@ const GroupDetail = ({ route }) => {
 							cancelButtonColor="#F50000"
 							doneButtonColor="#33BE99"
 							modalContent={
-								<View>
-									<View style={styles.carouselContainer}>
-										<Carousel
-											image={require("../../../../assets/images/GroupCard/Group.png")}
-											setIndex={setGroupColor}
-											defaultColor={colorMapping[color]}
-										/>
+								<>
+									<View style={{ ...styles.messageBarContainer, alignSelf: "center" }}>
+										<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
 									</View>
-									<View style={styles.inputContact}>
-										<GrayInput
-											placeholder={group_name}
-											style={styles.firstInput}
-											onChangeText={setNewGroupName}
-											defaultValue={group_name}
-										/>
-										<GrayInput
-											defaultValue={group_description}
-											placeholder={group_description ? group_description : ""}
-											style={styles.lastInput}
-											height={78}
-											borderRadius={18}
-											onChangeText={setNewGroupDescription}
-										/>
+									<View>
+										<View style={styles.carouselContainer}>
+											<Carousel
+												image={require("../../../../assets/images/GroupCard/Group.png")}
+												setIndex={setGroupColor}
+												defaultColor={colorMapping[color]}
+											/>
+										</View>
+										<View style={styles.inputContact}>
+											<GrayInput
+												placeholder={group_name}
+												style={styles.firstInput}
+												onChangeText={setNewGroupName}
+												defaultValue={group_name}
+											/>
+											<GrayInput
+												defaultValue={group_description}
+												placeholder={group_description ? group_description : ""}
+												style={styles.lastInput}
+												height={78}
+												borderRadius={18}
+												onChangeText={setNewGroupDescription}
+											/>
+										</View>
 									</View>
-								</View>
+								</>
 							}
 						/>
 					</>
@@ -581,5 +642,11 @@ const styles = StyleSheet.create({
 	membersList: {
 		width: 415,
 		marginTop: 15,
-	}
+	},
+	messageBarContainer: {
+		position: "absolute",
+		alignSelf: "center",
+		top: -34,
+	},
+	addMessageBarContainer: { position: "absolute", alignSelf: "center", top: -475 },
 });
