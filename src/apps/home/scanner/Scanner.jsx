@@ -38,6 +38,7 @@ const Scanner = () => {
 	const [yourName, setYourName] = useState("");
 	const [firstLetter, setFirstLetter] = useState("?");
 	const [yourColor, setYourColor] = useState(1);
+	const [errorMessage, setErrorMessage] = useState("");
 
 	useEffect(() => {
 		const handleBackButton = () => true;
@@ -204,10 +205,26 @@ const Scanner = () => {
 				company: company,
 				address: address,
 				color: color,
-				phones: phoneNumbers,
-				emails: emails,
-				dates: newDates,
-				urls: urls,
+				phones: phoneNumbers.map(phone => ({
+					type: phone.type,
+					phoneType: phone.phoneType || 1,
+					phoneCode: phone.phoneCode,
+					phoneNumber: phone.phoneNumber,
+				})),
+				emails: emails.map(email => ({
+					typeLabel: email.typeLabel,
+					email: email.email,
+				})),
+				dates: newDates.map(date => ({
+					typeLabel: date.typeLabel,
+					type: date.type || 1,
+					date: date.date,
+				})),
+				urls: urls.map(url => ({
+					typeLabel: url.typeLabel,
+					type: url.type || 1,
+					url: url.url,
+				})),
 			}),
 		})
 			.then((response) => {
@@ -219,7 +236,8 @@ const Scanner = () => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						console.log(text);
+						text = JSON.parse(text);
+						setErrorMessage(text.message);
 					});
 				}
 			})
@@ -238,6 +256,7 @@ const Scanner = () => {
 
 	function closeModal() {
 		setModalVisible(false);
+		setErrorMessage("");
 	}
 
 	const addPhoneNumber = () => {
@@ -389,6 +408,7 @@ const Scanner = () => {
 										/>
 									))}
 									<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
+									<Text style={styles.errorMessage}>{errorMessage}</Text>
 									<Text style={styles.sectionTitle}>Emails</Text>
 									{emails.map((email, index) => (
 										<EmailInput
@@ -489,7 +509,7 @@ const styles = StyleSheet.create({
 	},
 	nameText: {
 		fontSize: 24,
-		fontWeight: "BROmnyRegular",
+		fontFamily: "BROmnyRegular",
 		color: "black",
 		paddingTop: 10,
 		paddingBottom: 15,
@@ -498,7 +518,7 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		top: 100,
 		fontSize: 24,
-		fontWeight: "BROmnyRegular",
+		fontFamily: "BROmnyRegular",
 		color: "#8C91B4",
 		paddingBottom: 20,
 	},
@@ -516,5 +536,38 @@ const styles = StyleSheet.create({
 	list: {
 		marginTop: 20,
 		height: 366,
+	},
+	carouselContainer: {
+		marginLeft: -20,
+		marginRight: -20,
+	},
+	modalContentContainer: {
+		alignItems: "center",
+	},
+	modalContainer: {
+		alignItems: "center",
+	},
+	inputContact: {
+		marginTop: 20,
+		alignSelf: "center",
+	},
+	input: {
+		marginBottom: 12,
+	},
+	lastInput: {
+		marginBottom: 0,
+	},
+	sectionTitle: {
+		fontSize: 18,
+		fontFamily: "BROmnyMedium",
+		color: "#000",
+		marginTop: 20,
+		marginBottom: 10,
+	},
+	errorMessage: {
+		color: "#F50000",
+		fontSize: 16,
+		fontFamily: "BROmnyRegular",
+		marginTop: 10,
 	},
 });
