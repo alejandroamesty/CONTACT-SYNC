@@ -18,6 +18,7 @@ import CustomModal from "../../../components/modals/CustomModal";
 import DateInput from "../../../components/inputs/DateInput";
 import ConfirmationModal from "../../../components/modals/ConfirmationModal";
 import List from "../../../components/lists/List";
+import MessageBar from "../../../components/MessageBar";
 
 const Stack = createStackNavigator();
 
@@ -50,6 +51,9 @@ const HomeScreen = ({ navigation }) => {
 	const [doneClicked, setDoneClicked] = useState(false);
 	const [addToGroupClicked, setAddToGroupClicked] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
+	const [severity, setSeverity] = useState("error");
+	const [restart, setRestart] = useState(false);
+	const [message, setMessage] = useState("");
 
 	const colorMapping = {
 		1: "#FFAC20",
@@ -67,6 +71,60 @@ const HomeScreen = ({ navigation }) => {
 			BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
 		};
 	}, []);
+
+	useEffect(() => {
+		fetchContacts();
+	}, []);
+
+	useEffect(() => {
+		getContactById();
+	}, []);
+
+	useEffect(() => {
+		getAllContactsAndGroups();
+	}, []);
+
+	useEffect(() => {
+		phoneNumbers.forEach((phone, index) => {
+			console.log(`Phone ${index}:`, phone);
+		});
+		emails.forEach((email, index) => {
+			console.log(`Email ${index}:`, email);
+		});
+		urls.forEach((url, index) => {
+			console.log(`URL ${index}:`, url);
+		});
+		dates.forEach((date, index) => {
+			console.log(`Date ${index}:`, date);
+		});
+	}, [phoneNumbers, emails, urls, dates]);
+
+	const getContactById = () => {
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=1`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}).then((response) => {
+			if (response.status === 200) {
+				response.text().then((text) => {
+					text = JSON.parse(text);
+					const contact = text.contact;
+					setYourAlias(contact.contact_alias);
+					setYourName(contact.first_name);
+					setYourLastName(contact.last_name);
+					setYourColor(contact.color);
+				});
+			} else {
+				console.log(response.status);
+				response.text().then((text) => {
+					setSeverity("error");
+					setMessage(text.message);
+					setRestart(true);
+				});
+			}
+		});
+	};
 
 	const fetchContacts = () => {
 		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContacts`, {
@@ -98,7 +156,106 @@ const HomeScreen = ({ navigation }) => {
 				} else {
 					console.log(response.status);
 					response.text().then((text) => {
-						console.log(text);
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				setSeverity("error");
+				setMessage("Error on adding contacts");
+				setRestart(true);
+			});
+	};
+
+	const getAllContactsAndGroups = () => {
+		fetch(`${API_URL}:${API_PORT}/getAllContactsAndGroups`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response
+						.json()
+						.then((data) => {
+							setContactsAndGroups(data);
+						})
+						.catch((error) => {
+							setSeverity("error");
+							setMessage("Error on adding contacts");
+							setRestart(true);
+						});
+				} else if (response.status === 401) {
+					console.log("No session found");
+					navigation.navigate("SignIn");
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				setSeverity("error");
+				setMessage("Error on adding contacts");
+				setRestart(true);
+			});
+	};
+
+	const addContact = () => {
+		if (doneClicked) return;
+		setDoneClicked(true);
+		let newDates = [];
+		dates.forEach((date, index) => {
+			newDates.push({ ...date, date: `${date.date.getDate()}-${date.date.getMonth() + 1}-${date.date.getFullYear()}` });
+		});
+		console.log("Dates:", newDates);
+
+		if (!firstName || phoneNumbers[0].phoneNumber === "" || phoneNumbers[0].phoneCode === "") {
+			console.log("First name and phone number are required");
+			return;
+		}
+
+		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				firstName: firstName,
+				lastName: lastName,
+				alias: alias,
+				company: company,
+				address: address,
+				color: color,
+				phones: phoneNumbers,
+				emails: emails,
+				dates: newDates,
+				urls: urls,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					response.text().then((text) => {
+						fetchContacts();
+						setPhoneNumbers([{ type: "home", phoneType: 1, phoneCode: "", phoneNumber: "" }]);
+						setEmails([]);
+						setURLs([]);
+						setDates([]);
+						setDoneClicked(false);
+						closeModal();
+					});
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						text = JSON.parse(text);
+						setErrorMessage(text.message);
+						setDoneClicked(false);
 					});
 				}
 			})
@@ -106,49 +263,37 @@ const HomeScreen = ({ navigation }) => {
 				console.log("Error:", error);
 			});
 	};
-	useEffect(() => {
-		fetchContacts();
-	}, []);
 
-	useEffect(() => {
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/getContactById?id=1`, {
-			method: "GET",
+	const deleteContact = (contactId) => {
+		fetch(`${API_URL}:${API_PORT}/deleteContact`, {
+			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
 			},
-		}).then((response) => {
-			if (response.status === 200) {
-				response.text().then((text) => {
-					text = JSON.parse(text);
-					const contact = text.contact;
-					setYourAlias(contact.contact_alias);
-					setYourName(contact.first_name);
-					setYourLastName(contact.last_name);
-					setYourColor(contact.color);
-				});
-			} else {
-				console.log(response.status);
-				response.text().then((text) => {
-					console.log(text);
-				});
-			}
-		});
-	}, []);
-
-	useEffect(() => {
-		phoneNumbers.forEach((phone, index) => {
-			console.log(`Phone ${index}:`, phone);
-		});
-		emails.forEach((email, index) => {
-			console.log(`Email ${index}:`, email);
-		});
-		urls.forEach((url, index) => {
-			console.log(`URL ${index}:`, url);
-		});
-		dates.forEach((date, index) => {
-			console.log(`Date ${index}:`, date);
-		});
-	}, [phoneNumbers, emails, urls, dates]);
+			body: JSON.stringify({
+				contactId: contactId,
+			}),
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					setContacts((prevContacts) => prevContacts.filter((contact) => contact.id !== contactId));
+					console.log(contactId);
+					closeDeleteModal();
+				} else {
+					console.log(response.status);
+					response.text().then((text) => {
+						setSeverity("error");
+						setMessage(text.message);
+						setRestart(true);
+					});
+				}
+			})
+			.catch((error) => {
+				setSeverity("error");
+				setMessage("Error on deleting contact");
+				setRestart(true);
+			});
+	};
 
 	const filteredContacts = useMemo(
 		() => contacts.filter((contact) => contact.first_name.toLowerCase().includes(searchText.toLowerCase())),
@@ -260,125 +405,9 @@ const HomeScreen = ({ navigation }) => {
 		setDates(updatedDates);
 	};
 
-	const addContact = () => {
-		if (doneClicked) return;
-		setDoneClicked(true);
-		let newDates = [];
-		dates.forEach((date, index) => {
-			newDates.push({ ...date, date: `${date.date.getDate()}-${date.date.getMonth() + 1}-${date.date.getFullYear()}` });
-		});
-		console.log("Dates:", newDates);
-
-		if (!firstName || phoneNumbers[0].phoneNumber === "" || phoneNumbers[0].phoneCode === "") {
-			console.log("First name and phone number are required");
-			return;
-		}
-
-		fetch(`${API_URL}${API_PORT ? ":" + API_PORT : ""}/createContact`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				firstName: firstName,
-				lastName: lastName,
-				alias: alias,
-				company: company,
-				address: address,
-				color: color,
-				phones: phoneNumbers,
-				emails: emails,
-				dates: newDates,
-				urls: urls,
-			}),
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					response.text().then((text) => {
-						fetchContacts();
-						setPhoneNumbers([{ type: "home", phoneType: 1, phoneCode: "", phoneNumber: "" }]);
-						setEmails([]);
-						setURLs([]);
-						setDates([]);
-						setDoneClicked(false);
-						closeModal();
-					});
-				} else {
-					console.log(response.status);
-					response.text().then((text) => {
-						text = JSON.parse(text);
-						setErrorMessage(text.message);
-						setDoneClicked(false);
-					});
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
-	};
-
-	const deleteContact = (contactId) => {
-		fetch(`${API_URL}:${API_PORT}/deleteContact`, {
-			method: "DELETE",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				contactId: contactId,
-			}),
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					setContacts((prevContacts) => prevContacts.filter((contact) => contact.id !== contactId));
-					console.log(contactId);
-					closeDeleteModal();
-				} else {
-					console.log(response.status);
-					response.text().then((text) => {
-						console.log(text);
-					});
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
-	};
-
 	const onAccept = (contactId) => {
 		deleteContact(contactId);
 	};
-
-	useEffect(() => {
-		fetch(`${API_URL}:${API_PORT}/getAllContactsAndGroups`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					response
-						.json()
-						.then((data) => {
-							setContactsAndGroups(data);
-						})
-						.catch((error) => {
-							console.log("Error:", error);
-						});
-				} else if (response.status === 401) {
-					console.log("No session found");
-					navigation.navigate("SignIn");
-				} else {
-					console.log(response.status);
-					response.text().then((text) => {
-						console.log(text);
-					});
-				}
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-			});
-	}, []);
 
 	const fetchGroups = async (id) => {
 		try {
@@ -499,6 +528,9 @@ const HomeScreen = ({ navigation }) => {
 				doneButtonColor="#33BE99"
 				modalContent={
 					<View style={styles.modalContentContainer}>
+						<View style={styles.messageBarContainer}>
+							<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
+						</View>
 						<View style={styles.carouselContainer}>
 							<Carousel letter={firstName ? firstName[0].toUpperCase() : "?"} setIndex={setColor} />
 						</View>
@@ -529,12 +561,12 @@ const HomeScreen = ({ navigation }) => {
 									<Text style={styles.sectionTitle}>Phone Numbers</Text>
 									{phoneNumbers.map((phone, index) => (
 										<PhoneInput
-										key={index}
-										phone={phone}
-										setPhone={(newPhone) => setPhone(index, newPhone)}
-										removePhone={() => removePhone(index)}
+											key={index}
+											phone={phone}
+											setPhone={(newPhone) => setPhone(index, newPhone)}
+											removePhone={() => removePhone(index)}
 										/>
-										))}
+									))}
 									<AddButton onPress={addPhoneNumber} buttonText="add phone number" />
 									<Text style={styles.errorMessage}>{errorMessage}</Text>
 									<Text style={styles.sectionTitle}>Emails</Text>
@@ -585,6 +617,9 @@ const HomeScreen = ({ navigation }) => {
 				doneButtonColor="#33BE99"
 				modalContent={
 					<Animated.View style={{ opacity: fadeAnim }}>
+						<View style={styles.messageBarContainer}>
+							<MessageBar severity={severity} caption={message} showTime={3000} restart={restart} setRestart={setRestart} />
+						</View>
 						<View style={styles.modalContainer}>
 							<GrayInput placeholder="Search name of group" image={require("../../../../assets/images/Search.png")} />
 							<View style={styles.groupList}>
@@ -734,5 +769,9 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontFamily: "BROmnyRegular",
 		marginTop: 10,
+	},
+	messageBarContainer: {
+		position: "absolute",
+		top: -195,
 	},
 });

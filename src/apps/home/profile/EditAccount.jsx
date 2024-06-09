@@ -15,6 +15,7 @@ const EditAccount = ({ navigation: { goBack } }) => {
 	const [severity, setSeverity] = useState("error");
 	const [restart, setRestart] = useState(false);
 	const [message, setMessage] = useState("");
+
 	const handleSaveChanges = () => {
 		if (email === "" && (currentPassword === "" || newPassword === "" || confirmPassword === "")) {
 			alert("Please fill all fields");
