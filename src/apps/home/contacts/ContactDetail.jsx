@@ -258,7 +258,7 @@ const ContactDetail = ({ route, navigation: { goBack } }) => {
 					<Text style={styles.firstNameInitial}>{firstName[0] || "?"}</Text>
 				</View>
 				<Text style={styles.name}>{firstName ? `${firstName} ${lastName}` : id === 1 ? "Create your contact card" : "Contact"}</Text>
-				<Text style={styles.alias}>{alias ? `"${alias}"` : id === 1 ? 'Go to "Profile" and click the edit button' : ""}</Text>
+				<Text style={styles.alias}>{alias ? `"${alias}"` : id === 1 ? 'Go to "Profile" and click the edit button' : "ya"}</Text>
 			</View>
 			<ScrollView style={styles.container} indicatorStyle="white">
 				<View style={styles.infoContainer}>
