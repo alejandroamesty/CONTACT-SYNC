@@ -151,7 +151,7 @@ const GroupsScreen = ({ navigation }) => {
 			sortGroups();
 			setUpdateGroups(false);
 		}
-	}, [baseGroups]);
+	}, [updateGroups, baseGroups]);
 
 	const openModal = () => {
 		setModalVisible(true);
